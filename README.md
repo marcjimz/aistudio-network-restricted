@@ -31,6 +31,21 @@ Azure AI Studio is built on Azure Machine Learning as the primary resource provi
 
 An 'Azure AI hub' is a special kind of 'Azure Machine Learning workspace', that is kind = "hub".
 
+## >> SCRATCH SPACE, DO NOT PUBLISH for PRODUCTION <<
+
+We are going to add the following:
+
+- [ ] Virtual Network (VNet) and Subnet: Integrate your virtual network and subnet where your AI Studio resources will reside.
+- [ ] Network Security Groups (NSG): Define network security groups to control inbound and outbound traffic.
+- [ ] Private Endpoints: Create private endpoints for your AI Studio services to ensure they are accessible only within the VNet.
+- [ ] Private DNS Zone: Create a private DNS zone and link it to your VNet for DNS resolution of the private endpoints.
+- [ ] This is an unchecked checkbox
+
+
+## Pre-requisites
+
+This template expects that you have private VNet setup for your organization, and that you have traffic patterns established to access it securely. 
+
 ## Resources
 
 | Provider and type | Description |
