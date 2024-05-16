@@ -9,7 +9,7 @@ languages:
 - bicep
 - json
 ---
-# Azure AI Studio network-restricted setup 
+# Azure AI Studio network-restricted setup  
 
 <!-- ![Azure Public Test Date](https://azurequickstartsservice.blob.core.windows.net/badges/quickstarts/microsoft.machinelearningservices/aistudio-basics/PublicLastTestDate.svg)
 ![Azure Public Test Result](https://azurequickstartsservice.blob.core.windows.net/badges/quickstarts/microsoft.machinelearningservices/aistudio-basics/PublicDeployment.svg)
