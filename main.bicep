@@ -18,11 +18,11 @@ param location string = resourceGroup().location
 @description('Set of tags to apply to all resources.')
 param tags object = {}
 
-// @description('Resource ID of the virtual network to deploy the resource into.')
-// param vnetId string
+@description('Resource ID of the virtual network to deploy the resource into.')
+param vnetId string
 
-// @description('Name of the subnet to deploy into.')
-// param subnetName string
+@description('Name of the subnet to deploy into.')
+param subnetId string
 
 // Variables
 var name = toLower('${aiHubName}')
@@ -53,6 +53,10 @@ module aiHub 'modules/ai-hub.bicep' = {
     aiHubDescription: aiHubDescription
     location: location
     tags: tags
+
+    //network related
+    vnetId: vnetId
+    subnetId: subnetId
 
     // dependent resources
     aiServicesId: aiDependencies.outputs.aiservicesID
