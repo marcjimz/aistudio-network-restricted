@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "9462928046676412704"
+      "templateHash": "7328080229813693668"
     }
   },
   "parameters": {
@@ -388,7 +388,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "1849943354413399952"
+              "templateHash": "7074585898547242133"
             }
           },
           "parameters": {
@@ -505,11 +505,11 @@
                 },
                 "sharedPrivateLinkResources": [
                   {
-                    "name": "storageAccountLink",
+                    "name": "aiServicesLink",
                     "properties": {
-                      "groupId": "blob",
-                      "privateLinkResourceId": "storageAccountId",
-                      "requestMessage": "Please approve this private link.",
+                      "groupId": "AzureOpenAI",
+                      "privateLinkResourceId": "[parameters('aiServicesId')]",
+                      "requestMessage": "Please approve this private link for AI Services.",
                       "status": "Approved"
                     }
                   }

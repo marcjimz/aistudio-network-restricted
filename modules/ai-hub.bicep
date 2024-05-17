@@ -67,11 +67,11 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
     // private link settings
     sharedPrivateLinkResources: [
       {
-        name: 'storageAccountLink'
+        name: 'aiServicesLink'
         properties: {
-          groupId: 'blob'
-          privateLinkResourceId: 'storageAccountId'
-          requestMessage: 'Please approve this private link.'
+          groupId: 'AzureOpenAI'
+          privateLinkResourceId: aiServicesId
+          requestMessage: 'Please approve this private link for AI Services.'
           status: 'Approved'
         }
       }
