@@ -67,6 +67,42 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
     // private link settings
     sharedPrivateLinkResources: [
       {
+        name: 'storageAccountLink'
+        properties: {
+          groupId: 'blob'
+          privateLinkResourceId: storageAccountId
+          requestMessage: 'Please approve this private link.'
+          status: 'Approved'
+        }
+      }
+      {
+        name: 'keyVaultLink'
+        properties: {
+          groupId: 'vault'
+          privateLinkResourceId: keyVaultId
+          requestMessage: 'Please approve this private link.'
+          status: 'Approved'
+        }
+      }
+      {
+        name: 'containerRegistryLink'
+        properties: {
+          groupId: 'registry'
+          privateLinkResourceId: containerRegistryId
+          requestMessage: 'Please approve this private link.'
+          status: 'Approved'
+        }
+      }
+      {
+        name: 'applicationInsightsLink'
+        properties: {
+          groupId: 'appInsights'
+          privateLinkResourceId: applicationInsightsId
+          requestMessage: 'Please approve this private link.'
+          status: 'Approved'
+        }
+      }
+      {
         name: 'aiServicesLink'
         properties: {
           groupId: 'AzureOpenAI'

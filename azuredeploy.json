@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "7328080229813693668"
+      "templateHash": "14665195768735877908"
     }
   },
   "parameters": {
@@ -388,7 +388,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "7074585898547242133"
+              "templateHash": "14839865753419619386"
             }
           },
           "parameters": {
@@ -504,6 +504,42 @@
                   "outboundRules": {}
                 },
                 "sharedPrivateLinkResources": [
+                  {
+                    "name": "storageAccountLink",
+                    "properties": {
+                      "groupId": "blob",
+                      "privateLinkResourceId": "[parameters('storageAccountId')]",
+                      "requestMessage": "Please approve this private link.",
+                      "status": "Approved"
+                    }
+                  },
+                  {
+                    "name": "keyVaultLink",
+                    "properties": {
+                      "groupId": "vault",
+                      "privateLinkResourceId": "[parameters('keyVaultId')]",
+                      "requestMessage": "Please approve this private link.",
+                      "status": "Approved"
+                    }
+                  },
+                  {
+                    "name": "containerRegistryLink",
+                    "properties": {
+                      "groupId": "registry",
+                      "privateLinkResourceId": "[parameters('containerRegistryId')]",
+                      "requestMessage": "Please approve this private link.",
+                      "status": "Approved"
+                    }
+                  },
+                  {
+                    "name": "applicationInsightsLink",
+                    "properties": {
+                      "groupId": "appInsights",
+                      "privateLinkResourceId": "[parameters('applicationInsightsId')]",
+                      "requestMessage": "Please approve this private link.",
+                      "status": "Approved"
+                    }
+                  },
                   {
                     "name": "aiServicesLink",
                     "properties": {
