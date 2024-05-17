@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "13821874413480246176"
+      "templateHash": "3191011946817490982"
     }
   },
   "parameters": {
@@ -44,18 +44,6 @@
       "defaultValue": {},
       "metadata": {
         "description": "Set of tags to apply to all resources."
-      }
-    },
-    "vnetId": {
-      "type": "string",
-      "metadata": {
-        "description": "Resource ID of the virtual network to deploy the resource into."
-      }
-    },
-    "subnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the subnet to deploy into."
       }
     }
   },
