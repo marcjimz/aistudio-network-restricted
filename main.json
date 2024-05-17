@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "3951702102289543150"
+      "templateHash": "17797106610971801142"
     }
   },
   "parameters": {
@@ -46,13 +46,19 @@
         "description": "Set of tags to apply to all resources."
       }
     },
-    "vnetId": {
+    "vnetName": {
       "type": "string",
       "metadata": {
-        "description": "Resource ID of the virtual network to deploy the resource into."
+        "description": "Resource name of the virtual network to deploy the resource into."
       }
     },
-    "subnetId": {
+    "vnetRgName": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group name of the virtual network to deploy the resource into."
+      }
+    },
+    "subnetName": {
       "type": "string",
       "metadata": {
         "description": "Name of the subnet to deploy into."
@@ -61,7 +67,9 @@
   },
   "variables": {
     "name": "[toLower(format('{0}', parameters('aiHubName')))]",
-    "uniqueSuffix": "[substring(uniqueString(resourceGroup().id), 0, 4)]"
+    "uniqueSuffix": "[substring(uniqueString(resourceGroup().id), 0, 4)]",
+    "virtualNetworkId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription(), parameters('vnetRgName'), parameters('vnetName'))]",
+    "subnetId": "[format('{0}/subnets/{1}', variables('virtualNetworkId'), parameters('subnetName'))]"
   },
   "resources": [
     {
@@ -378,10 +386,10 @@
             "value": "[variables('uniqueSuffix')]"
           },
           "vnetId": {
-            "value": "[parameters('vnetId')]"
+            "value": "[variables('virtualNetworkId')]"
           },
           "subnetId": {
-            "value": "[parameters('subnetId')]"
+            "value": "[variables('subnetId')]"
           },
           "aiServicesId": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))), '2022-09-01').outputs.aiservicesID.value]"

@@ -18,17 +18,23 @@ param location string = resourceGroup().location
 @description('Set of tags to apply to all resources.')
 param tags object = {}
 
-@description('Resource ID of the virtual network to deploy the resource into.')
-param vnetId string
+@description('Resource name of the virtual network to deploy the resource into.')
+param vnetName string
+
+@description('Resource group name of the virtual network to deploy the resource into.')
+param vnetRgName string
 
 @description('Name of the subnet to deploy into.')
-param subnetId string
+param subnetName string
 
 // Variables
 var name = toLower('${aiHubName}')
 
 // Create a short, unique suffix, that will be unique to each resource group
 var uniqueSuffix = substring(uniqueString(resourceGroup().id), 0, 4)
+
+var virtualNetworkId = '/subscriptions/${subscription()}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
+var subnetId = '${virtualNetworkId}/subnets/${subnetName}'
 
 // Dependent resources for the Azure Machine Learning workspace
 module aiDependencies 'modules/dependent-resources.bicep' = {
@@ -58,7 +64,7 @@ module aiHub 'modules/ai-hub.bicep' = {
     uniqueSuffix: uniqueSuffix
 
     //network related
-    vnetId: vnetId
+    vnetId: virtualNetworkId
     subnetId: subnetId
 
     // dependent resources
