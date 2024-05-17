@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "2739133317440380795"
+      "templateHash": "13480601831062483340"
     }
   },
   "parameters": {
@@ -418,7 +418,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "11349485474048140750"
+              "templateHash": "10707030825730311207"
             }
           },
           "parameters": {
@@ -519,7 +519,8 @@
             "targetSubResource": [
               "amlworkspace"
             ],
-            "subnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}/subnets/{3}', subscription().subscriptionId, parameters('vnetRgName'), parameters('vnetName'), parameters('subnetName'))]"
+            "vnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription().subscriptionId, parameters('vnetRgName'), parameters('vnetName'))]",
+            "subnetResourceId": "[format('{0}/subnets/{1}', variables('vnetResourceId'), parameters('subnetName'))]"
           },
           "resources": [
             {
@@ -634,6 +635,67 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}-VirtualNetworkLink', parameters('aiHubName'))]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "virtualNetworkId": {
+                    "value": "[variables('vnetResourceId')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.27.1.19265",
+                      "templateHash": "2810826815907738108"
+                    }
+                  },
+                  "parameters": {
+                    "virtualNetworkId": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+                      "apiVersion": "2018-09-01",
+                      "name": "[format('privatelink.api.azureml.ms/{0}', uniqueString(parameters('virtualNetworkId')))]",
+                      "location": "global",
+                      "properties": {
+                        "virtualNetwork": {
+                          "id": "[parameters('virtualNetworkId')]"
+                        },
+                        "registrationEnabled": false
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+                      "apiVersion": "2018-09-01",
+                      "name": "[format('privatelink.notebooks.azure.net/{0}', uniqueString(parameters('virtualNetworkId')))]",
+                      "location": "global",
+                      "properties": {
+                        "virtualNetwork": {
+                          "id": "[parameters('virtualNetworkId')]"
+                        },
+                        "registrationEnabled": false
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', format('{0}-DNS', parameters('aiHubName')))]"
               ]
             }
           ],
