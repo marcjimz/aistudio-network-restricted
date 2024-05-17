@@ -54,6 +54,9 @@ module aiHub 'modules/ai-hub.bicep' = {
     location: location
     tags: tags
 
+    //metadata
+    uniqueSuffix: uniqueSuffix
+
     //network related
     vnetId: vnetId
     subnetId: subnetId

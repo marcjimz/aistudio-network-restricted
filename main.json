@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "2694985710586925564"
+      "templateHash": "3951702102289543150"
     }
   },
   "parameters": {
@@ -374,6 +374,9 @@
           "tags": {
             "value": "[parameters('tags')]"
           },
+          "uniqueSuffix": {
+            "value": "[variables('uniqueSuffix')]"
+          },
           "vnetId": {
             "value": "[parameters('vnetId')]"
           },
@@ -406,7 +409,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "16471814223735675570"
+              "templateHash": "133603235066601460"
             }
           },
           "parameters": {
@@ -488,6 +491,12 @@
               "metadata": {
                 "description": "Resource ID of the virtual network"
               }
+            },
+            "uniqueSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Unique Suffix used for name generation"
+              }
             }
           },
           "variables": {
@@ -552,10 +561,10 @@
                 "subnet": {
                   "id": "[parameters('subnetId')]"
                 },
-                "customNetworkInterfaceName": "[format('{0}-nic', parameters('aiHubName'))]",
+                "customNetworkInterfaceName": "[format('{0}-nic-{1}', parameters('aiHubName'), parameters('uniqueSuffix'))]",
                 "privateLinkServiceConnections": [
                   {
-                    "name": "[variables('privateEndpointName')]",
+                    "name": "[parameters('aiHubName')]",
                     "properties": {
                       "privateLinkServiceId": "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]",
                       "groupIds": "[variables('targetSubResource')]"

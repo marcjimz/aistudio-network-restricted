@@ -39,6 +39,9 @@ param subnetId string
 @description('Resource ID of the virtual network')
 param vnetId string
 
+@description('Unique Suffix used for name generation')
+param uniqueSuffix string
+
 resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
   name: aiHubName
   location: location
@@ -98,10 +101,10 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
     subnet: {
       id: subnetId
     }
-    customNetworkInterfaceName: '${aiHubName}-nic'
+    customNetworkInterfaceName: '${aiHubName}-nic-${uniqueSuffix}'
     privateLinkServiceConnections: [
       {
-        name: privateEndpointName
+        name: aiHubName
         properties: {
           privateLinkServiceId: aiHub.id
           groupIds: targetSubResource
