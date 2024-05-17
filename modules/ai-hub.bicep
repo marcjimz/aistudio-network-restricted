@@ -33,6 +33,12 @@ param aiServicesId string
 @description('Resource ID of the AI Services endpoint')
 param aiServicesTarget string
 
+@description('Resource ID of the virtual network')
+param vnetId string
+
+@description('Name of the subnet')
+param subnetName string
+
 resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-08-01-preview' = {
   name: aiHubName
   location: location
@@ -50,6 +56,24 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-08-01-preview'
     storageAccount: storageAccountId
     applicationInsights: applicationInsightsId
     containerRegistry: containerRegistryId
+
+    // network settings
+    publicNetworkAccess: 'Disabled'
+    vnetId: vnetId
+    privateEndpointConnections: [
+      {
+        name: '${aiHubName}-peconnection'
+        properties: {
+          privateLinkServiceConnectionState: {
+            status: 'Approved'
+            description: 'Auto-Approved'
+          }
+          subnet: {
+            id: '${vnetId}/subnets/${subnetName}'
+          }
+        }
+      }
+    ]
   }
   kind: 'hub'
 

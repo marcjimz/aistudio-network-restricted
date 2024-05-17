@@ -1,4 +1,4 @@
-// Execute this main file to depoy Azure AI studio resources in the basic security configuraiton
+// Execute this main file to deploy Azure AI studio resources in the basic security configuration
 
 // Parameters
 @minLength(2)
@@ -9,7 +9,7 @@ param aiHubName string = 'demo'
 @description('Friendly name for your Azure AI resource')
 param aiHubFriendlyName string = 'Demo AI resource'
 
-@description('Description of your Azure AI resource dispayed in AI studio')
+@description('Description of your Azure AI resource displayed in AI studio')
 param aiHubDescription string = 'This is an example AI resource for use in Azure AI Studio.'
 
 @description('Azure region used for the deployment of all resources.')
@@ -17,6 +17,12 @@ param location string = resourceGroup().location
 
 @description('Set of tags to apply to all resources.')
 param tags object = {}
+
+@description('Resource ID of the virtual network to deploy the resource into.')
+param vnetId string
+
+@description('Name of the subnet to deploy into.')
+param subnetName string
 
 // Variables
 var name = toLower('${aiHubName}')
@@ -55,5 +61,9 @@ module aiHub 'modules/ai-hub.bicep' = {
     containerRegistryId: aiDependencies.outputs.containerRegistryId
     keyVaultId: aiDependencies.outputs.keyvaultId
     storageAccountId: aiDependencies.outputs.storageId
+
+    // network settings
+    vnetId: vnetId
+    subnetName: subnetName
   }
 }
