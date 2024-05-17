@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "1569016707583481127"
+      "templateHash": "2739133317440380795"
     }
   },
   "parameters": {
@@ -418,7 +418,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "15222013386771692661"
+              "templateHash": "11349485474048140750"
             }
           },
           "parameters": {
@@ -590,6 +590,50 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}-DNS', parameters('aiHubName'))]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {},
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.27.1.19265",
+                      "templateHash": "17062012217240294251"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/privateDnsZones",
+                      "apiVersion": "2018-09-01",
+                      "name": "privatelink.api.azureml.ms",
+                      "location": "global",
+                      "tags": {},
+                      "properties": {}
+                    },
+                    {
+                      "type": "Microsoft.Network/privateDnsZones",
+                      "apiVersion": "2018-09-01",
+                      "name": "privatelink.notebooks.azure.net",
+                      "location": "global",
+                      "tags": {},
+                      "properties": {}
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
               ]
             }
           ],
