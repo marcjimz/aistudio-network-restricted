@@ -33,11 +33,14 @@ param aiServicesId string
 @description('Resource ID of the AI Services endpoint')
 param aiServicesTarget string
 
-@description('Resource ID of the Subnet ID to deploy the private endpoint into.')
-param subnetId string
+@description('Resource name of the virtual network to deploy the resource into.')
+param vnetName string
 
-@description('Resource ID of the virtual network')
-param vnetId string
+@description('Resource group name of the virtual network to deploy the resource into.')
+param vnetRgName string
+
+@description('Name of the subnet to deploy into.')
+param subnetName string
 
 @description('Unique Suffix used for name generation')
 param uniqueSuffix string
@@ -94,12 +97,13 @@ var privateEndpointName = '${aiHubName}-AIHub-PE'
 var targetSubResource = [
     'amlworkspace'
 ]
+
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   name: privateEndpointName
   location: location
   properties: {
     subnet: {
-      id: subnetId
+      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetName)
     }
     customNetworkInterfaceName: '${aiHubName}-nic-${uniqueSuffix}'
     privateLinkServiceConnections: [
@@ -112,6 +116,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
       }
     ]
   }
+
 }
 
 // module privateDnsDeployment './network/private-dns.bicep' = {
