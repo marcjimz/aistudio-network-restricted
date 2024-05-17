@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "11489898503542661268"
+      "templateHash": "13752575233900883550"
     }
   },
   "parameters": {
@@ -418,7 +418,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "10324987783083682140"
+              "templateHash": "11460665795221027366"
             }
           },
           "parameters": {
@@ -519,7 +519,7 @@
             "targetSubResource": [
               "amlworkspace"
             ],
-            "vnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription(), parameters('vnetRgName'), parameters('vnetName'))]"
+            "vnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription().tenantId, parameters('vnetRgName'), parameters('vnetName'))]"
           },
           "resources": [
             {
