@@ -114,37 +114,37 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   }
 }
 
-module privateDnsDeployment './network/private-dns.bicep' = {
-  name: '${aiHubName}-DNS'
-  params: {}
-  dependsOn: [
-    privateEndpoint
-  ]
-}
+// module privateDnsDeployment './network/private-dns.bicep' = {
+//   name: '${aiHubName}-DNS'
+//   params: {}
+//   dependsOn: [
+//     privateEndpoint
+//   ]
+// }
 
-module virtualNetworkLink './network/virtual-network-link.bicep' = {
-  name: '${aiHubName}-VirtualNetworkLink'
-  params: {
-    virtualNetworkId: vnetId
-  }
-  dependsOn: [
-    privateDnsDeployment
-  ]
-}
+// module virtualNetworkLink './network/virtual-network-link.bicep' = {
+//   name: '${aiHubName}-VirtualNetworkLink'
+//   params: {
+//     virtualNetworkId: vnetId
+//   }
+//   dependsOn: [
+//     privateDnsDeployment
+//   ]
+// }
 
-module dnsZoneGroup './network/dns-zone-group.bicep' = {
-  name: '${aiHubName}-dnsZoneGroup'
-  scope: resourceGroup()
-  params: {
-    vnetId: vnetId
-    privateEndpointName: privateEndpointName
-    location: location
-  }
-  dependsOn: [
-    privateEndpoint
-    privateDnsDeployment
-  ]
-}
+// module dnsZoneGroup './network/dns-zone-group.bicep' = {
+//   name: '${aiHubName}-dnsZoneGroup'
+//   scope: resourceGroup()
+//   params: {
+//     vnetId: vnetId
+//     privateEndpointName: privateEndpointName
+//     location: location
+//   }
+//   dependsOn: [
+//     privateEndpoint
+//     privateDnsDeployment
+//   ]
+// }
 
 
 output aiHubID string = aiHub.id
