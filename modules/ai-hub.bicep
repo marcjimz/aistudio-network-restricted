@@ -36,11 +36,8 @@ param aiServicesTarget string
 @description('Resource ID of the Subnet ID to deploy the private endpoint into.')
 param subnetId string
 
-// @description('Resource ID of the virtual network')
-// param vnetId string
-
-// @description('Name of the subnet')
-// param subnetName string
+@description('Resource ID of the virtual network')
+param vnetId string
 
 resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
   name: aiHubName
@@ -113,5 +110,38 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
     ]
   }
 }
+
+module privateDnsDeployment './network/private-dns.bicep' = {
+  name: '${aiHubName}-DNS'
+  params: {}
+  dependsOn: [
+    privateEndpoint
+  ]
+}
+
+module virtualNetworkLink './network/virtual-network-link.bicep' = {
+  name: '${aiHubName}-VirtualNetworkLink'
+  params: {
+    virtualNetworkId: vnetId
+  }
+  dependsOn: [
+    privateDnsDeployment
+  ]
+}
+
+module dnsZoneGroup './network/dns-zone-group.bicep' = {
+  name: '${aiHubName}-dnsZoneGroup'
+  scope: resourceGroup()
+  params: {
+    vnetId: vnetId
+    privateEndpointName: privateEndpointName
+    location: location
+  }
+  dependsOn: [
+    privateEndpoint
+    privateDnsDeployment
+  ]
+}
+
 
 output aiHubID string = aiHub.id
