@@ -130,15 +130,16 @@ module privateDnsDeployment './network/private-dns.bicep' = {
   ]
 }
 
-// module virtualNetworkLink './network/virtual-network-link.bicep' = {
-//   name: '${aiHubName}-VirtualNetworkLink'
-//   params: {
-//     virtualNetworkId: vnetResourceId
-//   }
-//   dependsOn: [
-//     privateDnsDeployment
-//   ]
-// }
+module virtualNetworkLink './network/virtual-network-link.bicep' = {
+  name: '${aiHubName}-VirtualNetworkLink'
+  scope: resourceGroup(subscription().subscriptionId, vnetRgName)
+  params: {
+    virtualNetworkId: vnetResourceId
+  }
+  dependsOn: [
+    privateDnsDeployment
+  ]
+}
 
 // module dnsZoneGroup './network/dns-zone-group.bicep' = {
 //   name: '${aiHubName}-dnsZoneGroup'
