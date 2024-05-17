@@ -33,13 +33,13 @@ param aiServicesId string
 @description('Resource ID of the AI Services endpoint')
 param aiServicesTarget string
 
-@description('Resource ID of the virtual network')
-param vnetId string
+// @description('Resource ID of the virtual network')
+// param vnetId string
 
-@description('Name of the subnet')
-param subnetName string
+// @description('Name of the subnet')
+// param subnetName string
 
-resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-08-01-preview' = {
+resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
   name: aiHubName
   location: location
   tags: tags
@@ -59,21 +59,37 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-08-01-preview'
 
     // network settings
     publicNetworkAccess: 'Disabled'
-    vnetId: vnetId
-    privateEndpointConnections: [
+    managedNetwork: {
+      isolationMode: 'Private'
+      // whitelist additional outbound rules here, of types: 'FQDN' | 'PrivateEndpoint' | 'ServiceTag'
+      // outboundRules: {
+      //   type: 'FQDN'
+      //   destinations: [
+      //     'dc.services.visualstudio.com',
+      //     'vortex.data.microsoft.com',
+      //     'dc.applicationinsights.azure.com',
+      //     'dc.services.visualstudio.com',
+      //     'dc.applicationinsights.microsoft.com'
+      //   ]
+      // }
+      outboundRules: {}
+    }
+
+    // private link settings
+    sharedPrivateLinkResources: [
       {
-        name: '${aiHubName}-peconnection'
+        name: 'storageAccountLink'
         properties: {
-          privateLinkServiceConnectionState: {
-            status: 'Approved'
-            description: 'Auto-Approved'
-          }
-          subnet: {
-            id: '${vnetId}/subnets/${subnetName}'
-          }
+          groupId: 'blob'
+          privateLinkResourceId: 'storageAccountId'
+          requestMessage: 'Please approve this private link.'
+          status: 'Approved'
         }
       }
+      // Add other private links as needed
     ]
+
+
   }
   kind: 'hub'
 

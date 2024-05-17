@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.26.54.24096",
-      "templateHash": "14262251343491140190"
+      "version": "0.27.1.19265",
+      "templateHash": "13821874413480246176"
     }
   },
   "parameters": {
@@ -29,7 +29,7 @@
       "type": "string",
       "defaultValue": "This is an example AI resource for use in Azure AI Studio.",
       "metadata": {
-        "description": "Description of your Azure AI resource dispayed in AI studio"
+        "description": "Description of your Azure AI resource displayed in AI studio"
       }
     },
     "location": {
@@ -44,6 +44,18 @@
       "defaultValue": {},
       "metadata": {
         "description": "Set of tags to apply to all resources."
+      }
+    },
+    "vnetId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the virtual network to deploy the resource into."
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the subnet to deploy into."
       }
     }
   },
@@ -90,8 +102,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "18174080564083878511"
+              "version": "0.27.1.19265",
+              "templateHash": "6904822858113875965"
             }
           },
           "parameters": {
@@ -387,8 +399,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "12922650283028523937"
+              "version": "0.27.1.19265",
+              "templateHash": "12752525157960634107"
             }
           },
           "parameters": {
@@ -484,7 +496,7 @@
             },
             {
               "type": "Microsoft.MachineLearningServices/workspaces",
-              "apiVersion": "2023-08-01-preview",
+              "apiVersion": "2023-10-01",
               "name": "[parameters('aiHubName')]",
               "location": "[parameters('location')]",
               "tags": "[parameters('tags')]",
@@ -497,7 +509,23 @@
                 "keyVault": "[parameters('keyVaultId')]",
                 "storageAccount": "[parameters('storageAccountId')]",
                 "applicationInsights": "[parameters('applicationInsightsId')]",
-                "containerRegistry": "[parameters('containerRegistryId')]"
+                "containerRegistry": "[parameters('containerRegistryId')]",
+                "publicNetworkAccess": "Disabled",
+                "managedNetwork": {
+                  "isolationMode": "Private",
+                  "outboundRules": {}
+                },
+                "sharedPrivateLinkResources": [
+                  {
+                    "name": "storageAccountLink",
+                    "properties": {
+                      "groupId": "blob",
+                      "privateLinkResourceId": "storageAccountId",
+                      "requestMessage": "Please approve this private link.",
+                      "status": "Approved"
+                    }
+                  }
+                ]
               },
               "kind": "hub"
             }

@@ -62,8 +62,5 @@ module aiHub 'modules/ai-hub.bicep' = {
     keyVaultId: aiDependencies.outputs.keyvaultId
     storageAccountId: aiDependencies.outputs.storageId
 
-    // network settings
-    vnetId: vnetId
-    subnetName: subnetName
   }
 }
