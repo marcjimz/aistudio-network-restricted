@@ -60,18 +60,7 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
     // network settings
     publicNetworkAccess: 'Disabled'
     managedNetwork: {
-      isolationMode: 'Private'
-      // whitelist additional outbound rules here, of types: 'FQDN' | 'PrivateEndpoint' | 'ServiceTag'
-      // outboundRules: {
-      //   type: 'FQDN'
-      //   destinations: [
-      //     'dc.services.visualstudio.com',
-      //     'vortex.data.microsoft.com',
-      //     'dc.applicationinsights.azure.com',
-      //     'dc.services.visualstudio.com',
-      //     'dc.applicationinsights.microsoft.com'
-      //   ]
-      // }
+      isolationMode: 'AllowOnlyApprovedOutbound'
       outboundRules: {}
     }
 

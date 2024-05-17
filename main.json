@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "3191011946817490982"
+      "templateHash": "9462928046676412704"
     }
   },
   "parameters": {
@@ -388,7 +388,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "12752525157960634107"
+              "templateHash": "1849943354413399952"
             }
           },
           "parameters": {
@@ -500,7 +500,7 @@
                 "containerRegistry": "[parameters('containerRegistryId')]",
                 "publicNetworkAccess": "Disabled",
                 "managedNetwork": {
-                  "isolationMode": "Private",
+                  "isolationMode": "AllowOnlyApprovedOutbound",
                   "outboundRules": {}
                 },
                 "sharedPrivateLinkResources": [
