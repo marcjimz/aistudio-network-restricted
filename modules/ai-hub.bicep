@@ -33,6 +33,9 @@ param aiServicesId string
 @description('Resource ID of the AI Services endpoint')
 param aiServicesTarget string
 
+@description('Resource ID of the Subnet ID to deploy the private endpoint into.')
+param subnetId string
+
 // @description('Resource ID of the virtual network')
 // param vnetId string
 
@@ -65,56 +68,7 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
     }
 
     // private link settings
-    sharedPrivateLinkResources: [
-      {
-        name: 'storageAccountLink'
-        properties: {
-          groupId: 'blob'
-          privateLinkResourceId: storageAccountId
-          requestMessage: 'Please approve this private link.'
-          status: 'Approved'
-        }
-      }
-      {
-        name: 'keyVaultLink'
-        properties: {
-          groupId: 'vault'
-          privateLinkResourceId: keyVaultId
-          requestMessage: 'Please approve this private link.'
-          status: 'Approved'
-        }
-      }
-      {
-        name: 'containerRegistryLink'
-        properties: {
-          groupId: 'registry'
-          privateLinkResourceId: containerRegistryId
-          requestMessage: 'Please approve this private link.'
-          status: 'Approved'
-        }
-      }
-      {
-        name: 'applicationInsightsLink'
-        properties: {
-          groupId: 'appInsights'
-          privateLinkResourceId: applicationInsightsId
-          requestMessage: 'Please approve this private link.'
-          status: 'Approved'
-        }
-      }
-      {
-        name: 'aiServicesLink'
-        properties: {
-          groupId: 'AzureOpenAI'
-          privateLinkResourceId: aiServicesId
-          requestMessage: 'Please approve this private link for AI Services.'
-          status: 'Approved'
-        }
-      }
-      // Add other private links as needed
-    ]
-
-
+    sharedPrivateLinkResources: []
   }
   kind: 'hub'
 
@@ -133,6 +87,30 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
         ResourceId: aiServicesId
       }
     }
+  }
+}
+
+var privateEndpointName = '${aiHubName}-AIHub-PE'
+var targetSubResource = [
+    'amlworkspace'
+]
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: privateEndpointName
+  location: location
+  properties: {
+    subnet: {
+      id: subnetId
+    }
+    customNetworkInterfaceName: '${aiHubName}-nic'
+    privateLinkServiceConnections: [
+      {
+        name: privateEndpointName
+        properties: {
+          privateLinkServiceId: aiHub.id
+          groupIds: targetSubResource
+        }
+      }
+    ]
   }
 }
 
