@@ -97,13 +97,14 @@ var privateEndpointName = '${aiHubName}-AIHub-PE'
 var targetSubResource = [
     'amlworkspace'
 ]
+var vnetResourceId = '/subscriptions/${subscription()}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   name: privateEndpointName
   location: location
   properties: {
     subnet: {
-      id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetName)
+      id: vnetResourceId
     }
     customNetworkInterfaceName: '${aiHubName}-nic-${uniqueSuffix}'
     privateLinkServiceConnections: [
