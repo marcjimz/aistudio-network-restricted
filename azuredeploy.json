@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "13060646196796565227"
+      "templateHash": "1569016707583481127"
     }
   },
   "parameters": {
@@ -418,7 +418,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "1690785295245431067"
+              "templateHash": "15222013386771692661"
             }
           },
           "parameters": {
@@ -519,7 +519,7 @@
             "targetSubResource": [
               "amlworkspace"
             ],
-            "vnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription().subscriptionId, parameters('vnetRgName'), parameters('vnetName'))]"
+            "subnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}/subnets/{3}', subscription().subscriptionId, parameters('vnetRgName'), parameters('vnetName'), parameters('subnetName'))]"
           },
           "resources": [
             {
@@ -575,7 +575,7 @@
               "location": "[parameters('location')]",
               "properties": {
                 "subnet": {
-                  "id": "[variables('vnetResourceId')]"
+                  "id": "[variables('subnetResourceId')]"
                 },
                 "customNetworkInterfaceName": "[format('{0}-nic-{1}', parameters('aiHubName'), parameters('uniqueSuffix'))]",
                 "privateLinkServiceConnections": [
