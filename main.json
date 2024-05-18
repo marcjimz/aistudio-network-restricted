@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "4256932666122553423"
+      "templateHash": "5372127332135509026"
     }
   },
   "parameters": {
@@ -418,7 +418,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "9864283848072480021"
+              "templateHash": "10038939863706371573"
             }
           },
           "parameters": {
@@ -712,8 +712,8 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                  "vnetId": {
-                    "value": "[variables('vnetResourceId')]"
+                  "vnetRgName": {
+                    "value": "[parameters('vnetRgName')]"
                   },
                   "privateEndpointName": {
                     "value": "[variables('privateEndpointName')]"
@@ -729,7 +729,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.27.1.19265",
-                      "templateHash": "11940290221964841179"
+                      "templateHash": "5775207469590924552"
                     }
                   },
                   "parameters": {
@@ -745,16 +745,15 @@
                         "description": "Azure region of the deployment"
                       }
                     },
-                    "vnetId": {
+                    "vnetRgName": {
                       "type": "string",
                       "metadata": {
-                        "description": "Resource ID of the virtual network"
+                        "description": "Resource Vnet name of the virtual network"
                       }
                     }
                   },
                   "variables": {
-                    "subscriptionId": "[subscription().subscriptionId]",
-                    "vnetResourceGroup": {}
+                    "subscriptionId": "[subscription().subscriptionId]"
                   },
                   "resources": [
                     {
@@ -767,13 +766,13 @@
                           {
                             "name": "privatelink-api-azureml-ms",
                             "properties": {
-                              "privateDnsZoneId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.api.azureml.ms', variables('subscriptionId'), variables('vnetResourceGroup'))]"
+                              "privateDnsZoneId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.api.azureml.ms', variables('subscriptionId'), parameters('vnetRgName'))]"
                             }
                           },
                           {
                             "name": "privatelink-notebooks-azure-net",
                             "properties": {
-                              "privateDnsZoneId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.notebooks.azure.net', variables('subscriptionId'), variables('vnetResourceGroup'))]"
+                              "privateDnsZoneId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.notebooks.azure.net', variables('subscriptionId'), parameters('vnetRgName'))]"
                             }
                           }
                         ]
