@@ -141,19 +141,19 @@ module virtualNetworkLink './network/virtual-network-link.bicep' = {
   ]
 }
 
-// module dnsZoneGroup './network/dns-zone-group.bicep' = {
-//   name: '${aiHubName}-dnsZoneGroup'
-//   scope: resourceGroup()
-//   params: {
-//     vnetId: vnetId
-//     privateEndpointName: privateEndpointName
-//     location: location
-//   }
-//   dependsOn: [
-//     privateEndpoint
-//     privateDnsDeployment
-//   ]
-// }
+module dnsZoneGroup './network/dns-zone-group.bicep' = {
+  name: '${aiHubName}-dnsZoneGroup'
+  scope: resourceGroup()
+  params: {
+    vnetId: vnetResourceId
+    privateEndpointName: privateEndpointName
+    location: location
+  }
+  dependsOn: [
+    privateEndpoint
+    privateDnsDeployment
+  ]
+}
 
 
 output aiHubID string = aiHub.id

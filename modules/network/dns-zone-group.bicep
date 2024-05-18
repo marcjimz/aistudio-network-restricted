@@ -24,7 +24,7 @@ resource privateEndpointName_default 'Microsoft.Network/privateEndpoints/private
       {
         name: 'privatelink-notebooks-azure-net'
         properties: {
-          privateDnsZoneId: '/subscriptions/${subscriptionId}/resourceGroups/${vnetResourceGroup}/providers/Microsoft.Network/privateDnsZones/privatelink.notebooks.azure.net'
+            privateDnsZoneId: '/subscriptions/${subscriptionId}/resourceGroups/${vnetResourceGroup}/providers/Microsoft.Network/privateDnsZones/privatelink.notebooks.azure.net'
         }
       }
     ]
