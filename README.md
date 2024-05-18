@@ -35,10 +35,10 @@ An 'Azure AI hub' is a special kind of 'Azure Machine Learning workspace', that 
 
 We are going to add the following:
 
-- [ ] Virtual Network (VNet) and Subnet: Integrate your virtual network and subnet where your AI Studio resources will reside.
-- [ ] Network Security Groups (NSG): Define network security groups to control inbound and outbound traffic.
-- [ ] Private Endpoints: Create private endpoints for your AI Studio services to ensure they are accessible only within the VNet.
-- [ ] Private DNS Zone: Create a private DNS zone and link it to your VNet for DNS resolution of the private endpoints.
+- [ X ] Virtual Network (VNet) and Subnet: Integrate your virtual network and subnet where your AI Studio resources will reside.
+- [ X ] Managed Outbound : Define inbound and outbound rules to secure private access.
+- [ X ] Private Endpoints: Create private endpoints for your AI Studio services to ensure they are accessible only within the VNet.
+- [ X ] Private DNS Zone: Create a private DNS zone and link it to your VNet for DNS resolution of the private endpoints.
 
 ## Pre-requisites
 

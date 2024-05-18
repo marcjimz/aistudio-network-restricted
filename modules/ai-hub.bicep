@@ -145,7 +145,7 @@ module dnsZoneGroup './network/dns-zone-group.bicep' = {
   name: '${aiHubName}-dnsZoneGroup'
   scope: resourceGroup()
   params: {
-    vnetId: vnetResourceId
+    vnetRgName: vnetRgName
     privateEndpointName: privateEndpointName
     location: location
   }
