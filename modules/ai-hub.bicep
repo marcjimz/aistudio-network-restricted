@@ -155,5 +155,4 @@ module dnsZoneGroup './network/dns-zone-group.bicep' = {
   ]
 }
 
-
 output aiHubID string = aiHub.id

@@ -25,20 +25,13 @@ languages:
 [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmarcjimz%2Faistudio-network-restricted%2Ffeat%2Fvnet%2Fazuredeploy.json)
 [![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fmarcjimz%2Faistudio-network-restricted%2Ffeat%2Fvnet%2Fazuredeploy.json)
 
-This set of templates demonstrates how to set up Azure AI Studio with a network-restricted configuration, meaning with public internet access disabled and egress disabled. It uses Microsoft-managed keys for encryption and Microsoft-managed identity configuration for the AI hub resource.
+This set of templates demonstrates how to set up Azure AI Studio with a network-restricted configuration, meaning with public internet access disabled and egress disabled. It uses Microsoft-managed keys for encryption and Microsoft-managed identity configuration for the AI hub resource. Customization is required to create rules for the managed outbound access, and setup does not include additional rules to facilitate traffic access to the managed VNet. This template works as-is.
+
+Azure AI Search and Azure AI Services do not support complete private deployments.
 
 Azure AI Studio is built on Azure Machine Learning as the primary resource provider and takes a dependency on the Cognitive Services (Azure AI Services) resource provider to surface model-as-a-service endpoints for Azure Speech, Azure Content Safety, and Azure OpenAI service.
 
 An 'Azure AI hub' is a special kind of 'Azure Machine Learning workspace', that is kind = "hub".
-
-## >> SCRATCH SPACE, DO NOT PUBLISH for PRODUCTION <<
-
-We are going to add the following:
-
-- [ X ] Virtual Network (VNet) and Subnet: Integrate your virtual network and subnet where your AI Studio resources will reside.
-- [ X ] Managed Outbound : Define inbound and outbound rules to secure private access.
-- [ X ] Private Endpoints: Create private endpoints for your AI Studio services to ensure they are accessible only within the VNet.
-- [ X ] Private DNS Zone: Create a private DNS zone and link it to your VNet for DNS resolution of the private endpoints.
 
 ## Pre-requisites
 
