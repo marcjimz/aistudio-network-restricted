@@ -33,6 +33,16 @@ Azure AI Studio is built on Azure Machine Learning as the primary resource provi
 
 An 'Azure AI hub' is a special kind of 'Azure Machine Learning workspace', that is kind = "hub".
 
+![Architecture](https://learn.microsoft.com/en-us/azure/ai-studio/media/how-to/network/azure-ai-network-inbound.svg)
+
+## Limitations
+
+Limitations are maintained and kept up-to-date [here](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/configure-private-link?source=recommendations&tabs=azure-portal#limitations):
+
+* Private Azure AI Services and Azure AI Search aren't supported.
+* The "Add your data" feature in the Azure AI Studio playground doesn't support private storage account.
+* You might encounter problems trying to access the private endpoint for your hub if you're using Mozilla Firefox. This problem might be related to DNS over HTTPS in Mozilla Firefox. We recommend using Microsoft Edge or Google Chrome.
+
 ## Pre-requisites
 
 This template expects that you have private VNet setup for your organization, and that you have traffic patterns established to access it securely. 
