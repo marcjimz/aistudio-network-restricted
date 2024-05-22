@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "524903685952608621"
+      "templateHash": "4421448063871401503"
     }
   },
   "parameters": {
@@ -114,7 +114,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "3331361752691923884"
+              "templateHash": "6707996576695973669"
             }
           },
           "parameters": {
@@ -411,7 +411,7 @@
               "properties": {
                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
                 "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('storageNameCleaned'))), '2018-11-30').principalId]",
-                "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned'))]"
+                "scope": "[resourceGroup().id]"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('storageNameCleaned')))]",
