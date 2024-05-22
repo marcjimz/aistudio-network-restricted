@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "7089722993026749249"
+      "templateHash": "15809405937691540717"
     }
   },
   "parameters": {
@@ -120,7 +120,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "10891054150661501311"
+              "templateHash": "1607738159915816024"
             }
           },
           "parameters": {
@@ -454,7 +454,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.27.1.19265",
-                      "templateHash": "14869751068214179974"
+                      "templateHash": "11149445365179210547"
                     }
                   },
                   "resources": [
@@ -474,7 +474,17 @@
                       "tags": {},
                       "properties": {}
                     }
-                  ]
+                  ],
+                  "outputs": {
+                    "blobDnsZoneId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/privateDnsZones', format('privatelink.blob.{0}', environment().suffixes.storage))]"
+                    },
+                    "fileDnsZoneId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/privateDnsZones', format('privatelink.file.{0}', environment().suffixes.storage))]"
+                    }
+                  }
                 }
               },
               "dependsOn": [
@@ -555,14 +565,17 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                  "vnetRgName": {
-                    "value": "[parameters('vnetRgName')]"
-                  },
                   "privateEndpointNameBlob": {
                     "value": "[format('{0}-blob-pe', variables('storageNameCleaned'))]"
                   },
                   "privateEndpointNameFile": {
                     "value": "[format('{0}-file-pe', variables('storageNameCleaned'))]"
+                  },
+                  "fileDnsZoneId": {
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', variables('storageNameCleaned'))), '2022-09-01').outputs.fileDnsZoneId.value]"
+                  },
+                  "blobDnsZoneId": {
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', variables('storageNameCleaned'))), '2022-09-01').outputs.blobDnsZoneId.value]"
                   }
                 },
                 "template": {
@@ -572,7 +585,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.27.1.19265",
-                      "templateHash": "15710676946908431213"
+                      "templateHash": "4681944389660673857"
                     }
                   },
                   "parameters": {
@@ -588,15 +601,18 @@
                         "description": "Name for the file PE endpoint"
                       }
                     },
-                    "vnetRgName": {
+                    "fileDnsZoneId": {
                       "type": "string",
                       "metadata": {
-                        "description": "Resource Vnet name of the virtual network"
+                        "description": "Dns Zone ID for File Blob Storage"
+                      }
+                    },
+                    "blobDnsZoneId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Dns Zone ID for Blob Blob Storage"
                       }
                     }
-                  },
-                  "variables": {
-                    "subscriptionId": "[subscription().subscriptionId]"
                   },
                   "resources": [
                     {
@@ -608,7 +624,7 @@
                           {
                             "name": "privatelink-blob-core-windows-net",
                             "properties": {
-                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.blob.{2}', variables('subscriptionId'), parameters('vnetRgName'), environment().suffixes.storage))]"
+                              "privateDnsZoneId": "[parameters('blobDnsZoneId')]"
                             }
                           }
                         ]
@@ -623,7 +639,7 @@
                           {
                             "name": "privatelink-file-core-windows-net",
                             "properties": {
-                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.file.{2}', variables('subscriptionId'), parameters('vnetRgName'), environment().suffixes.storage))]"
+                              "privateDnsZoneId": "[parameters('fileDnsZoneId')]"
                             }
                           }
                         ]
@@ -731,7 +747,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "10261211422307049962"
+              "templateHash": "4069159111209278730"
             }
           },
           "parameters": {
@@ -923,7 +939,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.27.1.19265",
-                      "templateHash": "17062012217240294251"
+                      "templateHash": "4194721046875296873"
                     }
                   },
                   "resources": [
@@ -943,7 +959,17 @@
                       "tags": {},
                       "properties": {}
                     }
-                  ]
+                  ],
+                  "outputs": {
+                    "notebookDnsZoneId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.notebooks.azure.net')]"
+                    },
+                    "apiDnsZoneId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.api.azureml.ms')]"
+                    }
+                  }
                 }
               },
               "dependsOn": [
@@ -1023,11 +1049,14 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                  "vnetRgName": {
-                    "value": "[parameters('vnetRgName')]"
-                  },
                   "privateEndpointName": {
                     "value": "[variables('privateEndpointName')]"
+                  },
+                  "apiDnsZoneId": {
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', parameters('aiHubName'))), '2022-09-01').outputs.apiDnsZoneId.value]"
+                  },
+                  "notebookDnsZoneId": {
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', parameters('aiHubName'))), '2022-09-01').outputs.notebookDnsZoneId.value]"
                   }
                 },
                 "template": {
@@ -1037,7 +1066,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.27.1.19265",
-                      "templateHash": "7494467029355789872"
+                      "templateHash": "11483531555879006235"
                     }
                   },
                   "parameters": {
@@ -1047,15 +1076,18 @@
                         "description": "Name for the endpoint"
                       }
                     },
-                    "vnetRgName": {
+                    "notebookDnsZoneId": {
                       "type": "string",
                       "metadata": {
-                        "description": "Resource Vnet name of the virtual network"
+                        "description": "Dns Zone ID for notebook private link"
+                      }
+                    },
+                    "apiDnsZoneId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Dns Zone ID for API private link"
                       }
                     }
-                  },
-                  "variables": {
-                    "subscriptionId": "[subscription().subscriptionId]"
                   },
                   "resources": [
                     {
@@ -1067,13 +1099,13 @@
                           {
                             "name": "privatelink-api-azureml-ms",
                             "properties": {
-                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.api.azureml.ms', variables('subscriptionId'), parameters('vnetRgName')))]"
+                              "privateDnsZoneId": "[parameters('apiDnsZoneId')]"
                             }
                           },
                           {
                             "name": "privatelink-notebooks-azure-net",
                             "properties": {
-                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/privateDnsZones/privatelink.notebooks.azure.net', variables('subscriptionId'), parameters('vnetRgName')))]"
+                              "privateDnsZoneId": "[parameters('notebookDnsZoneId')]"
                             }
                           }
                         ]
