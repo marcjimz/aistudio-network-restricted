@@ -4,10 +4,11 @@ param privateEndpointNameBlob string
 @description('Name for the file PE endpoint')
 param privateEndpointNameFile string
 
-@description('Resource Vnet name of the virtual network')
-param vnetRgName string
+@description('Dns Zone ID for File Blob Storage')
+param fileDnsZoneId string
 
-var subscriptionId = subscription().subscriptionId
+@description('Dns Zone ID for Blob Blob Storage')
+param blobDnsZoneId string
 
 resource privateEndpointName_blob_default 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = {
   name: '${privateEndpointNameBlob}/default'
@@ -16,7 +17,7 @@ resource privateEndpointName_blob_default 'Microsoft.Network/privateEndpoints/pr
       {
         name: 'privatelink-blob-core-windows-net'
         properties: {
-            privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', '/subscriptions/${subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/privateDnsZones/privatelink.blob.${environment().suffixes.storage}')
+            privateDnsZoneId: blobDnsZoneId
         }
       }
     ]
@@ -30,7 +31,7 @@ resource privateEndpointName_file_default 'Microsoft.Network/privateEndpoints/pr
       {
         name: 'privatelink-file-core-windows-net'
         properties: {
-            privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', '/subscriptions/${subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/privateDnsZones/privatelink.file.${environment().suffixes.storage}')
+            privateDnsZoneId: fileDnsZoneId
         }
       }
     ]

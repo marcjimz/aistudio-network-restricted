@@ -266,9 +266,10 @@ module dnsZoneGroup './storage/dns-zone-group.bicep' = {
   name: '${storageNameCleaned}-dnsZoneGroup'
   scope: resourceGroup()
   params: {
-    vnetRgName: vnetRgName
     privateEndpointNameBlob: '${storageNameCleaned}-blob-pe'
     privateEndpointNameFile: '${storageNameCleaned}-file-pe'
+    fileDnsZoneId: privateDnsDeployment.outputs.fileDnsZoneId
+    blobDnsZoneId: privateDnsDeployment.outputs.blobDnsZoneId
   }
   dependsOn: [
     storagePrivateEndpointBlob

@@ -11,3 +11,6 @@ resource privatelink_file_core_windows_net 'Microsoft.Network/privateDnsZones@20
   tags: {}
   properties: {}
 }
+
+output blobDnsZoneId string = privatelink_blob_core_windows_net.id
+output fileDnsZoneId string = privatelink_file_core_windows_net.id

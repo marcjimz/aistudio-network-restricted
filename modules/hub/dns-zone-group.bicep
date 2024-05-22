@@ -1,10 +1,11 @@
 @description('Name for the endpoint')
 param privateEndpointName string
 
-@description('Resource Vnet name of the virtual network')
-param vnetRgName string
+@description('Dns Zone ID for notebook private link')
+param notebookDnsZoneId string
 
-var subscriptionId = subscription().subscriptionId
+@description('Dns Zone ID for API private link')
+param apiDnsZoneId string
 
 resource privateEndpointName_default 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-05-01' = {
   name: '${privateEndpointName}/default'
@@ -13,13 +14,13 @@ resource privateEndpointName_default 'Microsoft.Network/privateEndpoints/private
       {
         name: 'privatelink-api-azureml-ms'
         properties: {
-            privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', '/subscriptions/${subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/privateDnsZones/privatelink.api.azureml.ms')
+            privateDnsZoneId: apiDnsZoneId
         }
       }
       {
         name: 'privatelink-notebooks-azure-net'
         properties: {
-            privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', '/subscriptions/${subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/privateDnsZones/privatelink.notebooks.azure.net')
+            privateDnsZoneId: notebookDnsZoneId
         }
       }
     ]
