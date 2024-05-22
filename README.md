@@ -22,29 +22,30 @@ languages:
 
 ![Bicep Version](https://azurequickstartsservice.blob.core.windows.net/badges/quickstarts/microsoft.machinelearningservices/aistudio-basics/BicepVersion.svg)
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmarcjimz%2Faistudio-network-restricted%2Fsecurity-changes%2Fazuredeploy.json)
-[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fmarcjimz%2Faistudio-network-restricted%2Fsecurity-changes%2Fazuredeploy.json)
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmarcjimz%2Faistudio-network-restricted%2Fmain%2Fazuredeploy.json)
+[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fmarcjimz%2Faistudio-network-restricted%2Fmain%2Fazuredeploy.json)
 
-This set of templates demonstrates how to set up Azure AI Studio with a network-restricted configuration, meaning with public internet access disabled and egress disabled. It uses Microsoft-managed keys for encryption and Microsoft-managed identity configuration for the AI hub resource.
+This set of templates demonstrates how to set up Azure AI Studio with a network-restricted configuration, meaning with public internet access disabled and egress disabled. It uses Microsoft-managed keys for encryption and Microsoft-managed identity configuration for the AI hub resource. Customization is required to create rules for the managed outbound access, and setup does not include additional rules to facilitate traffic access to the managed VNet. This template works as-is.
+
+**NOTE: Azure AI Search and Azure AI Services do not support complete private deployments.**
 
 Azure AI Studio is built on Azure Machine Learning as the primary resource provider and takes a dependency on the Cognitive Services (Azure AI Services) resource provider to surface model-as-a-service endpoints for Azure Speech, Azure Content Safety, and Azure OpenAI service.
 
 An 'Azure AI hub' is a special kind of 'Azure Machine Learning workspace', that is kind = "hub".
 
-## >> SCRATCH SPACE, DO NOT PUBLISH for PRODUCTION <<
+![Architecture](https://learn.microsoft.com/en-us/azure/ai-studio/media/how-to/network/azure-ai-network-inbound.svg)
 
-We are going to add the following:
+## Limitations
 
-- [ ] Virtual Network (VNet) and Subnet: Integrate your virtual network and subnet where your AI Studio resources will reside.
-- [ ] Network Security Groups (NSG): Define network security groups to control inbound and outbound traffic.
-- [ ] Private Endpoints: Create private endpoints for your AI Studio services to ensure they are accessible only within the VNet.
-- [ ] Private DNS Zone: Create a private DNS zone and link it to your VNet for DNS resolution of the private endpoints.
-- [ ] This is an unchecked checkbox
+Limitations are maintained and kept up-to-date [here](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/configure-private-link?source=recommendations&tabs=azure-portal#limitations):
 
+* Private Azure AI Services and Azure AI Search aren't supported.
+* The "Add your data" feature in the Azure AI Studio playground doesn't support private storage account.
+* You might encounter problems trying to access the private endpoint for your hub if you're using Mozilla Firefox. This problem might be related to DNS over HTTPS in Mozilla Firefox. We recommend using Microsoft Edge or Google Chrome.
 
 ## Pre-requisites
 
-This template expects that you have private VNet setup for your organization, and that you have traffic patterns established to access it securely. 
+This template expects that you have private VNet setup for your organization, and that you have traffic patterns established to access it securely. You must have access to creating private endpoints for the VNet setup you wish to connect.
 
 ## Resources
 

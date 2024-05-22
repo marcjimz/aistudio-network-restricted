@@ -18,6 +18,12 @@ param containerRegistryName string
 @description('The name of the Key Vault')
 param keyvaultName string
 
+@description('Subnet Id to deploy into.')
+param subnetResourceId string
+
+@description('Unique Suffix used for name generation')
+param uniqueSuffix string
+
 var containerRegistryNameCleaned = replace(containerRegistryName, '-', '')
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
@@ -126,6 +132,17 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2021-10-01' = {
     apiProperties: {
       statisticsEnabled: false
     }
+    networkAcls: {
+      defaultAction: 'Deny'
+      virtualNetworkRules: [
+        {
+          id: subnetResourceId
+          ignoreMissingVnetServiceEndpoint: false
+        }
+      ]
+      ipRules: []
+    }
+    customSubDomainName: aiServicesName
   }
 }
 
@@ -176,6 +193,63 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       defaultAction: 'Deny'
     }
     supportsHttpsTrafficOnly: true
+    publicNetworkAccess: 'Disabled'
+  }
+}
+
+resource storagePrivateEndpointBlob 'Microsoft.Network/privateEndpoints@2021-03-01' = {
+  name: '${storageNameCleaned}-blob-pe'
+  location: location
+  properties: {
+    subnet: {
+      id: subnetResourceId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'blob'
+        properties: {
+          privateLinkServiceId: storage.id
+          groupIds: [
+            'blob'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource storagePrivateEndpointFile 'Microsoft.Network/privateEndpoints@2021-03-01' = {
+  name: '${storageNameCleaned}-file-pe'
+  location: location
+  properties: {
+    subnet: {
+      id: subnetResourceId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'file'
+        properties: {
+          privateLinkServiceId: storage.id
+          groupIds: [
+            'file'
+          ]
+        }
+      }
+    ]
+  }
+}
+
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+  name: '${storageNameCleaned}-identity'
+  location: location
+}
+
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(storage.id, managedIdentity.id, 'Storage Blob Data Contributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
+    principalId: managedIdentity.properties.principalId
+    scope: resourceGroup().id
   }
 }
 

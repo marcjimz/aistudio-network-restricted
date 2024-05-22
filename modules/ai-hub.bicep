@@ -33,7 +33,19 @@ param aiServicesId string
 @description('Resource ID of the AI Services endpoint')
 param aiServicesTarget string
 
-resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-08-01-preview' = {
+@description('Resource Id of the virtual network to deploy the resource into.')
+param vnetResourceId string
+
+@description('Resource group name of the virtual network to deploy the resource into.')
+param vnetRgName string
+
+@description('Subnet Id to deploy into.')
+param subnetResourceId string
+
+@description('Unique Suffix used for name generation')
+param uniqueSuffix string
+
+resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
   name: aiHubName
   location: location
   tags: tags
@@ -50,13 +62,23 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-08-01-preview'
     storageAccount: storageAccountId
     applicationInsights: applicationInsightsId
     containerRegistry: containerRegistryId
+
+    // network settings
+    publicNetworkAccess: 'Disabled'
+    managedNetwork: {
+      isolationMode: 'AllowOnlyApprovedOutbound'
+      outboundRules: {}
+    }
+
+    // private link settings
+    sharedPrivateLinkResources: []
   }
   kind: 'hub'
 
   resource aiServicesConnection 'connections@2024-01-01-preview' = {
-    name: '${aiHubName}-connection-AzureOpenAI'
+    name: '${aiHubName}-connection-AIServices'
     properties: {
-      category: 'AzureOpenAI'
+      category: 'AIServices'
       target: aiServicesTarget
       authType: 'ApiKey'
       isSharedToAll: true
@@ -69,6 +91,68 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-08-01-preview'
       }
     }
   }
+}
+
+var privateEndpointName = '${aiHubName}-AIHub-PE'
+var targetSubResource = [
+    'amlworkspace'
+]
+// var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
+// var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
+
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: privateEndpointName
+  location: location
+  properties: {
+    subnet: {
+      id: subnetResourceId
+    }
+    customNetworkInterfaceName: '${aiHubName}-nic-${uniqueSuffix}'
+    privateLinkServiceConnections: [
+      {
+        name: aiHubName
+        properties: {
+          privateLinkServiceId: aiHub.id
+          groupIds: targetSubResource
+        }
+      }
+    ]
+  }
+
+}
+
+module privateDnsDeployment './network/private-dns.bicep' = {
+  name: '${aiHubName}-DNS'
+  scope: resourceGroup(subscription().subscriptionId, vnetRgName)
+  params: {}
+  dependsOn: [
+    privateEndpoint
+  ]
+}
+
+module virtualNetworkLink './network/virtual-network-link.bicep' = {
+  name: '${aiHubName}-VirtualNetworkLink'
+  scope: resourceGroup(subscription().subscriptionId, vnetRgName)
+  params: {
+    virtualNetworkId: vnetResourceId
+  }
+  dependsOn: [
+    privateDnsDeployment
+  ]
+}
+
+module dnsZoneGroup './network/dns-zone-group.bicep' = {
+  name: '${aiHubName}-dnsZoneGroup'
+  scope: resourceGroup()
+  params: {
+    vnetRgName: vnetRgName
+    privateEndpointName: privateEndpointName
+    location: location
+  }
+  dependsOn: [
+    privateEndpoint
+    privateDnsDeployment
+  ]
 }
 
 output aiHubID string = aiHub.id
