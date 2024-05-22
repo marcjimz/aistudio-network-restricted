@@ -18,6 +18,9 @@ param containerRegistryName string
 @description('The name of the Key Vault')
 param keyvaultName string
 
+@description('Subnet Id to deploy into.')
+param subnetResourceId string
+
 var containerRegistryNameCleaned = replace(containerRegistryName, '-', '')
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
@@ -126,6 +129,17 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2021-10-01' = {
     apiProperties: {
       statisticsEnabled: false
     }
+    networkAcls: {
+      defaultAction: 'Deny'
+      virtualNetworkRules: [
+        {
+          id: subnetResourceId
+          ignoreMissingVnetServiceEndpoint: false
+        }
+      ]
+      ipRules: []
+    }
+    customSubDomainName: aiServicesName
   }
 }
 

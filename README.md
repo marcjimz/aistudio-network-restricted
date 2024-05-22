@@ -45,7 +45,7 @@ Limitations are maintained and kept up-to-date [here](https://learn.microsoft.co
 
 ## Pre-requisites
 
-This template expects that you have private VNet setup for your organization, and that you have traffic patterns established to access it securely. 
+This template expects that you have private VNet setup for your organization, and that you have traffic patterns established to access it securely. You must have access to creating private endpoints for the VNet setup you wish to connect.
 
 ## Resources
 

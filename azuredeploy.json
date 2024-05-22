@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "5372127332135509026"
+      "templateHash": "15176629889122656904"
     }
   },
   "parameters": {
@@ -67,7 +67,9 @@
   },
   "variables": {
     "name": "[toLower(format('{0}', parameters('aiHubName')))]",
-    "uniqueSuffix": "[substring(uniqueString(resourceGroup().id), 0, 4)]"
+    "uniqueSuffix": "[substring(uniqueString(resourceGroup().id), 0, 4)]",
+    "vnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription().subscriptionId, parameters('vnetRgName'), parameters('vnetName'))]",
+    "subnetResourceId": "[format('{0}/subnets/{1}', variables('vnetResourceId'), parameters('subnetName'))]"
   },
   "resources": [
     {
@@ -100,6 +102,9 @@
           },
           "tags": {
             "value": "[parameters('tags')]"
+          },
+          "subnetResourceId": {
+            "value": "[variables('subnetResourceId')]"
           }
         },
         "template": {
@@ -109,7 +114,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "6904822858113875965"
+              "templateHash": "6202361567103405639"
             }
           },
           "parameters": {
@@ -149,6 +154,12 @@
               "type": "string",
               "metadata": {
                 "description": "The name of the Key Vault"
+              }
+            },
+            "subnetResourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Subnet Id to deploy into."
               }
             },
             "storageName": {
@@ -271,7 +282,18 @@
               "properties": {
                 "apiProperties": {
                   "statisticsEnabled": false
-                }
+                },
+                "networkAcls": {
+                  "defaultAction": "Deny",
+                  "virtualNetworkRules": [
+                    {
+                      "id": "[parameters('subnetResourceId')]",
+                      "ignoreMissingVnetServiceEndpoint": false
+                    }
+                  ],
+                  "ipRules": []
+                },
+                "customSubDomainName": "[parameters('aiServicesName')]"
               }
             },
             {
@@ -383,14 +405,14 @@
           "uniqueSuffix": {
             "value": "[variables('uniqueSuffix')]"
           },
-          "vnetName": {
-            "value": "[parameters('vnetName')]"
-          },
           "vnetRgName": {
             "value": "[parameters('vnetRgName')]"
           },
-          "subnetName": {
-            "value": "[parameters('subnetName')]"
+          "vnetResourceId": {
+            "value": "[variables('vnetResourceId')]"
+          },
+          "subnetResourceId": {
+            "value": "[variables('subnetResourceId')]"
           },
           "aiServicesId": {
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))), '2022-09-01').outputs.aiservicesID.value]"
@@ -418,7 +440,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "10038939863706371573"
+              "templateHash": "17701385825775861096"
             }
           },
           "parameters": {
@@ -489,10 +511,10 @@
                 "description": "Resource ID of the AI Services endpoint"
               }
             },
-            "vnetName": {
+            "vnetResourceId": {
               "type": "string",
               "metadata": {
-                "description": "Resource name of the virtual network to deploy the resource into."
+                "description": "Resource Id of the virtual network to deploy the resource into."
               }
             },
             "vnetRgName": {
@@ -501,10 +523,10 @@
                 "description": "Resource group name of the virtual network to deploy the resource into."
               }
             },
-            "subnetName": {
+            "subnetResourceId": {
               "type": "string",
               "metadata": {
-                "description": "Name of the subnet to deploy into."
+                "description": "Subnet Id to deploy into."
               }
             },
             "uniqueSuffix": {
@@ -518,9 +540,7 @@
             "privateEndpointName": "[format('{0}-AIHub-PE', parameters('aiHubName'))]",
             "targetSubResource": [
               "amlworkspace"
-            ],
-            "vnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription().subscriptionId, parameters('vnetRgName'), parameters('vnetName'))]",
-            "subnetResourceId": "[format('{0}/subnets/{1}', variables('vnetResourceId'), parameters('subnetName'))]"
+            ]
           },
           "resources": [
             {
@@ -576,7 +596,7 @@
               "location": "[parameters('location')]",
               "properties": {
                 "subnet": {
-                  "id": "[variables('subnetResourceId')]"
+                  "id": "[parameters('subnetResourceId')]"
                 },
                 "customNetworkInterfaceName": "[format('{0}-nic-{1}', parameters('aiHubName'), parameters('uniqueSuffix'))]",
                 "privateLinkServiceConnections": [
@@ -652,7 +672,7 @@
                 "mode": "Incremental",
                 "parameters": {
                   "virtualNetworkId": {
-                    "value": "[variables('vnetResourceId')]"
+                    "value": "[parameters('vnetResourceId')]"
                   }
                 },
                 "template": {

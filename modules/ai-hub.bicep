@@ -33,14 +33,14 @@ param aiServicesId string
 @description('Resource ID of the AI Services endpoint')
 param aiServicesTarget string
 
-@description('Resource name of the virtual network to deploy the resource into.')
-param vnetName string
+@description('Resource Id of the virtual network to deploy the resource into.')
+param vnetResourceId string
 
 @description('Resource group name of the virtual network to deploy the resource into.')
 param vnetRgName string
 
-@description('Name of the subnet to deploy into.')
-param subnetName string
+@description('Subnet Id to deploy into.')
+param subnetResourceId string
 
 @description('Unique Suffix used for name generation')
 param uniqueSuffix string
@@ -97,8 +97,8 @@ var privateEndpointName = '${aiHubName}-AIHub-PE'
 var targetSubResource = [
     'amlworkspace'
 ]
-var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
-var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
+// var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
+// var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   name: privateEndpointName

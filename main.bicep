@@ -33,6 +33,9 @@ var name = toLower('${aiHubName}')
 // Create a short, unique suffix, that will be unique to each resource group
 var uniqueSuffix = substring(uniqueString(resourceGroup().id), 0, 4)
 
+var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
+var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
+
 // Dependent resources for the Azure Machine Learning workspace
 module aiDependencies 'modules/dependent-resources.bicep' = {
   name: 'dependencies-${name}-${uniqueSuffix}-deployment'
@@ -44,6 +47,7 @@ module aiDependencies 'modules/dependent-resources.bicep' = {
     containerRegistryName: 'cr${name}${uniqueSuffix}'
     aiServicesName: 'ais${name}${uniqueSuffix}'
     tags: tags
+    subnetResourceId: subnetResourceId
   }
 }
 
@@ -61,9 +65,9 @@ module aiHub 'modules/ai-hub.bicep' = {
     uniqueSuffix: uniqueSuffix
 
     //network related
-    vnetName: vnetName
     vnetRgName: vnetRgName
-    subnetName: subnetName
+    vnetResourceId: vnetResourceId
+    subnetResourceId: subnetResourceId
 
     // dependent resources
     aiServicesId: aiDependencies.outputs.aiservicesID
