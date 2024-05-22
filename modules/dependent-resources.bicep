@@ -246,7 +246,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-prev
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor
     principalId: managedIdentity.properties.principalId
-    scope: storage.id
+    scope: resourceGroup().id // Changed scope to resource group level
   }
 }
 
