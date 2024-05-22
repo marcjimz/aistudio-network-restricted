@@ -21,8 +21,11 @@ param keyvaultName string
 @description('Subnet Id to deploy into.')
 param subnetResourceId string
 
-@description('Unique Suffix used for name generation')
-param uniqueSuffix string
+@description('Resource group name of the virtual network to deploy the resource into.')
+param vnetRgName string
+
+@description('Resource Id of the virtual network to deploy the resource into.')
+param vnetResourceId string
 
 var containerRegistryNameCleaned = replace(containerRegistryName, '-', '')
 
@@ -237,6 +240,43 @@ resource storagePrivateEndpointFile 'Microsoft.Network/privateEndpoints@2021-03-
       }
     ]
   }
+}
+
+module privateDnsDeployment './storage/private-dns.bicep' = {
+  name: '${storageNameCleaned}-DNS'
+  scope: resourceGroup(subscription().subscriptionId, vnetRgName)
+  params: {}
+  dependsOn: [
+    storagePrivateEndpointBlob
+    storagePrivateEndpointFile
+  ]
+}
+
+module virtualNetworkLink './storage/virtual-network-link.bicep' = {
+  name: '${storageNameCleaned}-VirtualNetworkLink'
+  scope: resourceGroup(subscription().subscriptionId, vnetRgName)
+  params: {
+    virtualNetworkId: vnetResourceId
+  }
+  dependsOn: [
+    privateDnsDeployment
+  ]
+}
+
+module dnsZoneGroup './storage/dns-zone-group.bicep' = {
+  name: '${storageNameCleaned}-dnsZoneGroup'
+  scope: resourceGroup()
+  params: {
+    vnetRgName: vnetRgName
+    privateEndpointNameBlob: '${storageNameCleaned}-blob-pe'
+    privateEndpointNameFile: '${storageNameCleaned}-file-pe'
+    location: location
+  }
+  dependsOn: [
+    storagePrivateEndpointBlob
+    storagePrivateEndpointFile
+    privateDnsDeployment
+  ]
 }
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
