@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "14089508768169343093"
+      "templateHash": "389501035397515213"
     }
   },
   "parameters": {
@@ -67,7 +67,7 @@
   },
   "variables": {
     "name": "[toLower(format('{0}', parameters('aiHubName')))]",
-    "uniqueSuffix": "[substring(uniqueString(resourceGroup().id), 0, 4)]",
+    "uniqueSuffix": "[substring(uniqueString(resourceGroup().id), 0, 7)]",
     "vnetResourceId": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}', subscription().subscriptionId, parameters('vnetRgName'), parameters('vnetName'))]",
     "subnetResourceId": "[format('{0}/subnets/{1}', variables('vnetResourceId'), parameters('subnetName'))]"
   },
@@ -117,7 +117,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "10393683680718084701"
+              "templateHash": "2704174455840253760"
             }
           },
           "parameters": {
@@ -302,7 +302,7 @@
                   ],
                   "ipRules": []
                 },
-                "customSubDomainName": "[format('{0}{1}', parameters('aiServicesName'), parameters('uniqueSuffix'))]"
+                "customSubDomainName": "[parameters('aiServicesName')]"
               }
             },
             {

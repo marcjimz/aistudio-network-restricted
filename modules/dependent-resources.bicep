@@ -142,7 +142,7 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2021-10-01' = {
       ]
       ipRules: []
     }
-    customSubDomainName: '${aiServicesName}${uniqueSuffix}'
+    customSubDomainName: aiServicesName
   }
 }
 

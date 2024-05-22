@@ -31,7 +31,7 @@ param subnetName string
 var name = toLower('${aiHubName}')
 
 // Create a short, unique suffix, that will be unique to each resource group
-var uniqueSuffix = substring(uniqueString(resourceGroup().id), 0, 4)
+var uniqueSuffix = substring(uniqueString(resourceGroup().id), 0, 7)
 
 var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
 var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
