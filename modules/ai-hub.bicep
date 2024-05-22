@@ -76,9 +76,9 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2023-10-01' = {
   kind: 'hub'
 
   resource aiServicesConnection 'connections@2024-01-01-preview' = {
-    name: '${aiHubName}-connection-AzureOpenAI'
+    name: '${aiHubName}-connection-AIServices'
     properties: {
-      category: 'AzureOpenAI'
+      category: 'AI Services'
       target: aiServicesTarget
       authType: 'ApiKey'
       isSharedToAll: true

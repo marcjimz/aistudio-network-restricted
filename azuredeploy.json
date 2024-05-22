@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "15176629889122656904"
+      "templateHash": "524903685952608621"
     }
   },
   "parameters": {
@@ -114,7 +114,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "6202361567103405639"
+              "templateHash": "3331361752691923884"
             }
           },
           "parameters": {
@@ -344,8 +344,79 @@
                   "bypass": "AzureServices",
                   "defaultAction": "Deny"
                 },
-                "supportsHttpsTrafficOnly": true
+                "supportsHttpsTrafficOnly": true,
+                "publicNetworkAccess": "Disabled"
               }
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2021-03-01",
+              "name": "[format('{0}-blob-pe', variables('storageNameCleaned'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "subnet": {
+                  "id": "[parameters('subnetResourceId')]"
+                },
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "blob",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned'))]",
+                      "groupIds": [
+                        "blob"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2021-03-01",
+              "name": "[format('{0}-file-pe', variables('storageNameCleaned'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "subnet": {
+                  "id": "[parameters('subnetResourceId')]"
+                },
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "file",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned'))]",
+                      "groupIds": [
+                        "file"
+                      ]
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2018-11-30",
+              "name": "[format('{0}-identity', variables('storageNameCleaned'))]",
+              "location": "[parameters('location')]"
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-04-01-preview",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned')), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('storageNameCleaned'))), 'Storage Blob Data Contributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('storageNameCleaned'))), '2018-11-30').principalId]",
+                "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned'))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('{0}-identity', variables('storageNameCleaned')))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameCleaned'))]"
+              ]
             }
           ],
           "outputs": {
@@ -440,7 +511,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "17701385825775861096"
+              "templateHash": "11744957813260292877"
             }
           },
           "parameters": {
@@ -546,9 +617,9 @@
             {
               "type": "Microsoft.MachineLearningServices/workspaces/connections",
               "apiVersion": "2024-01-01-preview",
-              "name": "[format('{0}/{1}', parameters('aiHubName'), format('{0}-connection-AzureOpenAI', parameters('aiHubName')))]",
+              "name": "[format('{0}/{1}', parameters('aiHubName'), format('{0}-connection-AIServices', parameters('aiHubName')))]",
               "properties": {
-                "category": "AzureOpenAI",
+                "category": "AI Services",
                 "target": "[parameters('aiServicesTarget')]",
                 "authType": "ApiKey",
                 "isSharedToAll": true,
