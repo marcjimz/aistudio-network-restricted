@@ -97,8 +97,6 @@ var privateEndpointName = '${aiHubName}-AIHub-PE'
 var targetSubResource = [
     'amlworkspace'
 ]
-// var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
-// var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   name: privateEndpointName
@@ -121,7 +119,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
 
 }
 
-module privateDnsDeployment './network/private-dns.bicep' = {
+module privateDnsDeployment './hub/private-dns.bicep' = {
   name: '${aiHubName}-DNS'
   scope: resourceGroup(subscription().subscriptionId, vnetRgName)
   params: {}
@@ -130,7 +128,7 @@ module privateDnsDeployment './network/private-dns.bicep' = {
   ]
 }
 
-module virtualNetworkLink './network/virtual-network-link.bicep' = {
+module virtualNetworkLink './hub/virtual-network-link.bicep' = {
   name: '${aiHubName}-VirtualNetworkLink'
   scope: resourceGroup(subscription().subscriptionId, vnetRgName)
   params: {
@@ -141,7 +139,7 @@ module virtualNetworkLink './network/virtual-network-link.bicep' = {
   ]
 }
 
-module dnsZoneGroup './network/dns-zone-group.bicep' = {
+module dnsZoneGroup './hub/dns-zone-group.bicep' = {
   name: '${aiHubName}-dnsZoneGroup'
   scope: resourceGroup()
   params: {
