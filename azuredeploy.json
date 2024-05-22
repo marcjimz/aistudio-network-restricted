@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "8904923168398509103"
+      "templateHash": "14089508768169343093"
     }
   },
   "parameters": {
@@ -105,6 +105,9 @@
           },
           "subnetResourceId": {
             "value": "[variables('subnetResourceId')]"
+          },
+          "uniqueSuffix": {
+            "value": "[variables('uniqueSuffix')]"
           }
         },
         "template": {
@@ -114,7 +117,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "6707996576695973669"
+              "templateHash": "10393683680718084701"
             }
           },
           "parameters": {
@@ -160,6 +163,12 @@
               "type": "string",
               "metadata": {
                 "description": "Subnet Id to deploy into."
+              }
+            },
+            "uniqueSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Unique Suffix used for name generation"
               }
             },
             "storageName": {
@@ -293,7 +302,7 @@
                   ],
                   "ipRules": []
                 },
-                "customSubDomainName": "[parameters('aiServicesName')]"
+                "customSubDomainName": "[format('{0}{1}', parameters('aiServicesName'), parameters('uniqueSuffix'))]"
               }
             },
             {

@@ -48,6 +48,7 @@ module aiDependencies 'modules/dependent-resources.bicep' = {
     aiServicesName: 'ais${name}${uniqueSuffix}'
     tags: tags
     subnetResourceId: subnetResourceId
+    uniqueSuffix: uniqueSuffix
   }
 }
 

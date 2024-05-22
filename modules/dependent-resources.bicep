@@ -21,6 +21,9 @@ param keyvaultName string
 @description('Subnet Id to deploy into.')
 param subnetResourceId string
 
+@description('Unique Suffix used for name generation')
+param uniqueSuffix string
+
 var containerRegistryNameCleaned = replace(containerRegistryName, '-', '')
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
@@ -139,7 +142,7 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2021-10-01' = {
       ]
       ipRules: []
     }
-    customSubDomainName: aiServicesName
+    customSubDomainName: '${aiServicesName}${uniqueSuffix}'
   }
 }
 
