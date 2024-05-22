@@ -145,7 +145,6 @@ module dnsZoneGroup './hub/dns-zone-group.bicep' = {
   params: {
     vnetRgName: vnetRgName
     privateEndpointName: privateEndpointName
-    location: location
   }
   dependsOn: [
     privateEndpoint
