@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "8412667203287616971"
+      "templateHash": "8904923168398509103"
     }
   },
   "parameters": {
@@ -511,7 +511,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "16456164891520795715"
+              "templateHash": "15168441716994606766"
             }
           },
           "parameters": {
@@ -619,7 +619,7 @@
               "apiVersion": "2024-01-01-preview",
               "name": "[format('{0}/{1}', parameters('aiHubName'), format('{0}-connection-AIServices', parameters('aiHubName')))]",
               "properties": {
-                "category": "ApiKey",
+                "category": "AIServices",
                 "target": "[parameters('aiServicesTarget')]",
                 "authType": "ApiKey",
                 "isSharedToAll": true,
