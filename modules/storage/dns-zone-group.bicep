@@ -7,8 +7,6 @@ param privateEndpointNameFile string
 @description('Resource Vnet name of the virtual network')
 param vnetRgName string
 
-var subscriptionId = subscription().subscriptionId
-
 resource privateEndpointName_blob_default 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = {
   name: '${privateEndpointNameBlob}/default'
   properties: {
@@ -16,7 +14,7 @@ resource privateEndpointName_blob_default 'Microsoft.Network/privateEndpoints/pr
       {
         name: 'privatelink-blob-core-windows-net'
         properties: {
-            privateDnsZoneId: resourceId(subscriptionId, 'Microsoft.Network/privateDnsZones', vnetRgName, 'privatelink.blob.${environment().suffixes.storage}')
+            privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', '${vnetRgName}/privatelink.blob.${environment().suffixes.storage}')
         }
       }
     ]
@@ -30,7 +28,7 @@ resource privateEndpointName_file_default 'Microsoft.Network/privateEndpoints/pr
       {
         name: 'privatelink-file-core-windows-net'
         properties: {
-            privateDnsZoneId: resourceId(subscriptionId, 'Microsoft.Network/privateDnsZones', vnetRgName, 'privatelink.file.${environment().suffixes.storage}')
+            privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', '${vnetRgName}/privatelink.file.${environment().suffixes.storage}')
         }
       }
     ]
