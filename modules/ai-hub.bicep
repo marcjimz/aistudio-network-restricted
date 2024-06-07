@@ -119,7 +119,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
 
 }
 
-module privateDnsDeployment './hub/private-dns.bicep' = {
+module privateDnsDeployment './hub/privatedns.bicep' = {
   name: '${aiHubName}-DNS'
   scope: resourceGroup(subscription().subscriptionId, vnetRgName)
   params: {}
@@ -128,7 +128,7 @@ module privateDnsDeployment './hub/private-dns.bicep' = {
   ]
 }
 
-module virtualNetworkLink './hub/virtual-network-link.bicep' = {
+module virtualNetworkLink './hub/virtualnetworklink.bicep' = {
   name: '${aiHubName}-VirtualNetworkLink'
   scope: resourceGroup(subscription().subscriptionId, vnetRgName)
   params: {
@@ -139,7 +139,7 @@ module virtualNetworkLink './hub/virtual-network-link.bicep' = {
   ]
 }
 
-module dnsZoneGroup './hub/dns-zone-group.bicep' = {
+module dnsZoneGroup './hub/dnszonegroup.bicep' = {
   name: '${aiHubName}-dnsZoneGroup'
   scope: resourceGroup()
   params: {

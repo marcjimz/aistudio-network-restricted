@@ -22,7 +22,7 @@ var name = toLower('${prefix}')
 // Create a short, unique suffix, that will be unique to each resource group
 var uniqueSuffix = substring(uniqueString(resourceGroup().id), 0, 4)
 
-module applicationInsights 'modules/applicationinsights.bicep' = {
+module applicationInsights 'dependent/applicationinsights.bicep' = {
   name: 'appi-${name}-${uniqueSuffix}-deployment'
   params: {
     location: location
@@ -33,7 +33,7 @@ module applicationInsights 'modules/applicationinsights.bicep' = {
 }
 
 // Dependent resources for the Azure Machine Learning workspace
-module keyvault 'modules/keyvault.bicep' = {
+module keyvault 'dependent/keyvault.bicep' = {
   name: 'kv-${name}-${uniqueSuffix}-deployment'
   params: {
     location: location
@@ -45,7 +45,7 @@ module keyvault 'modules/keyvault.bicep' = {
   }
 }
 
-module containerRegistry 'modules/containerregistry.bicep' = {
+module containerRegistry 'dependent/containerregistry.bicep' = {
   name: 'cr${name}${uniqueSuffix}-deployment'
   params: {
     location: location
@@ -57,7 +57,7 @@ module containerRegistry 'modules/containerregistry.bicep' = {
   }
 }
 
-module aiServices 'modules/aiservices.bicep' = {
+module aiServices 'dependent/aiservices.bicep' = {
   name: 'ai${name}${uniqueSuffix}-deployment'
   params: {
     location: location
@@ -69,7 +69,7 @@ module aiServices 'modules/aiservices.bicep' = {
   }
 }
 
-module storage 'modules/storage.bicep' = {
+module storage 'dependent/storage.bicep' = {
   name: 'st${name}${uniqueSuffix}-deployment'
   params: {
     location: location

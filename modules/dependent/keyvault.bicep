@@ -72,7 +72,8 @@ resource keyVaultPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' =
 }
 
 resource privateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
-  name: '${keyVaultPrivateEndpoint.name}/vault-PrivateDnsZoneGroup'
+  parent: keyVaultPrivateEndpoint
+  name: 'vault-PrivateDnsZoneGroup'
   properties:{
     privateDnsZoneConfigs: [
       {
@@ -86,7 +87,8 @@ resource privateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 }
 
 resource keyVaultPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${keyVaultPrivateDnsZone.name}/${uniqueString(keyVault.id)}'
+  parent: keyVaultPrivateDnsZone
+  name: uniqueString(keyVault.id)
   location: 'global'
   properties: {
     registrationEnabled: false

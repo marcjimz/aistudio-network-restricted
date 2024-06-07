@@ -83,7 +83,8 @@ resource acrPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 }
 
 resource privateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
-  name: '${containerRegistryPrivateEndpoint.name}/${groupName}-PrivateDnsZoneGroup'
+  parent: containerRegistryPrivateEndpoint
+  name: '${groupName}-PrivateDnsZoneGroup'
   properties:{
     privateDnsZoneConfigs: [
       {
@@ -97,7 +98,8 @@ resource privateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 }
 
 resource acrPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${acrPrivateDnsZone.name}/${uniqueString(containerRegistry.id)}'
+  parent: acrPrivateDnsZone
+  name: uniqueString(containerRegistry.id)
   location: 'global'
   properties: {
     registrationEnabled: false

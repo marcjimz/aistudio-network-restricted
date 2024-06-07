@@ -90,7 +90,8 @@ resource aiServicePrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' 
 }
 
 resource aiServicePrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
-  name: '${aiServicePrivateEndpoint.name}/aiservice-PrivateDnsZoneGroup'
+  parent: aiServicePrivateEndpoint
+  name: 'aiservice-PrivateDnsZoneGroup'
   properties:{
     privateDnsZoneConfigs: [
       {
@@ -104,7 +105,8 @@ resource aiServicePrivateEndpointDns 'Microsoft.Network/privateEndpoints/private
 }
 
 resource aiServicePrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${aiServicePrivateDnsZone.name}/${uniqueString(aiServices.id)}'
+  parent: aiServicePrivateDnsZone
+  name: uniqueString(aiServices.id)
   location: 'global'
   properties: {
     registrationEnabled: false

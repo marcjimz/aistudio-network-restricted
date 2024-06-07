@@ -150,7 +150,8 @@ resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 }
 
 resource privateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
-  name: '${storagePrivateEndpointBlob.name}/blob-PrivateDnsZoneGroup'
+  parent: storagePrivateEndpointBlob
+  name: 'blob-PrivateDnsZoneGroup'
   properties:{
     privateDnsZoneConfigs: [
       {
@@ -164,7 +165,8 @@ resource privateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 }
 
 resource blobPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${blobPrivateDnsZone.name}/${uniqueString(storage.id)}'
+  parent: blobPrivateDnsZone
+  name: uniqueString(storage.id)
   location: 'global'
   properties: {
     registrationEnabled: false
@@ -180,7 +182,8 @@ resource filePrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 }
 
 resource filePrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
-  name: '${storagePrivateEndpointFile.name}/flie-PrivateDnsZoneGroup'
+  parent: storagePrivateEndpointFile
+  name: 'flie-PrivateDnsZoneGroup'
   properties:{
     privateDnsZoneConfigs: [
       {
@@ -194,7 +197,8 @@ resource filePrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZo
 }
 
 resource filePrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${filePrivateDnsZone.name}/${uniqueString(storage.id)}'
+  parent: filePrivateDnsZone
+  name: uniqueString(storage.id)
   location: 'global'
   properties: {
     registrationEnabled: false
