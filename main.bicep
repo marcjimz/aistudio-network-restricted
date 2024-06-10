@@ -65,7 +65,6 @@ module aiHub 'modules/ai-hub.bicep' = {
     uniqueSuffix: uniqueSuffix
 
     //network related
-    vnetRgName: vnetRgName
     vnetResourceId: vnetResourceId
     subnetResourceId: subnetResourceId
 

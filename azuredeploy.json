@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "12803872710866321829"
+      "templateHash": "3935836087440828724"
     }
   },
   "parameters": {
@@ -1215,9 +1215,6 @@
           "uniqueSuffix": {
             "value": "[variables('uniqueSuffix')]"
           },
-          "vnetRgName": {
-            "value": "[parameters('vnetRgName')]"
-          },
           "vnetResourceId": {
             "value": "[variables('vnetResourceId')]"
           },
@@ -1250,7 +1247,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "17131492553826649808"
+              "templateHash": "15013335611457403766"
             }
           },
           "parameters": {
@@ -1325,12 +1322,6 @@
               "type": "string",
               "metadata": {
                 "description": "Resource Id of the virtual network to deploy the resource into."
-              }
-            },
-            "vnetRgName": {
-              "type": "string",
-              "metadata": {
-                "description": "Resource group name of the virtual network to deploy the resource into."
               }
             },
             "subnetResourceId": {
@@ -1424,202 +1415,75 @@
               ]
             },
             {
-              "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
-              "name": "[format('{0}-DNS', parameters('aiHubName'))]",
-              "subscriptionId": "[subscription().subscriptionId]",
-              "resourceGroup": "[parameters('vnetRgName')]",
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2020-06-01",
+              "name": "privatelink.api.azureml.ms",
+              "location": "global",
+              "tags": {},
+              "properties": {}
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2020-06-01",
+              "name": "privatelink.notebooks.azure.net",
+              "location": "global",
+              "tags": {},
+              "properties": {}
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/{1}', 'privatelink.api.azureml.ms', uniqueString(parameters('vnetResourceId')))]",
+              "location": "global",
               "properties": {
-                "expressionEvaluationOptions": {
-                  "scope": "inner"
+                "virtualNetwork": {
+                  "id": "[parameters('vnetResourceId')]"
                 },
-                "mode": "Incremental",
-                "parameters": {},
-                "template": {
-                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "contentVersion": "1.0.0.0",
-                  "metadata": {
-                    "_generator": {
-                      "name": "bicep",
-                      "version": "0.28.1.47646",
-                      "templateHash": "14324299341397164241"
-                    }
-                  },
-                  "resources": [
-                    {
-                      "type": "Microsoft.Network/privateDnsZones",
-                      "apiVersion": "2020-06-01",
-                      "name": "privatelink.api.azureml.ms",
-                      "location": "global",
-                      "tags": {},
-                      "properties": {}
-                    },
-                    {
-                      "type": "Microsoft.Network/privateDnsZones",
-                      "apiVersion": "2020-06-01",
-                      "name": "privatelink.notebooks.azure.net",
-                      "location": "global",
-                      "tags": {},
-                      "properties": {}
-                    }
-                  ],
-                  "outputs": {
-                    "notebookDnsZoneId": {
-                      "type": "string",
-                      "value": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.notebooks.azure.net')]"
-                    },
-                    "apiDnsZoneId": {
-                      "type": "string",
-                      "value": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.api.azureml.ms')]"
-                    }
-                  }
-                }
+                "registrationEnabled": false
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.api.azureml.ms')]"
               ]
             },
             {
-              "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
-              "name": "[format('{0}-VirtualNetworkLink', parameters('aiHubName'))]",
-              "subscriptionId": "[subscription().subscriptionId]",
-              "resourceGroup": "[parameters('vnetRgName')]",
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/{1}', 'privatelink.notebooks.azure.net', uniqueString(parameters('vnetResourceId')))]",
+              "location": "global",
               "properties": {
-                "expressionEvaluationOptions": {
-                  "scope": "inner"
+                "virtualNetwork": {
+                  "id": "[parameters('vnetResourceId')]"
                 },
-                "mode": "Incremental",
-                "parameters": {
-                  "virtualNetworkId": {
-                    "value": "[parameters('vnetResourceId')]"
-                  }
-                },
-                "template": {
-                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "contentVersion": "1.0.0.0",
-                  "metadata": {
-                    "_generator": {
-                      "name": "bicep",
-                      "version": "0.28.1.47646",
-                      "templateHash": "9690087794842286736"
-                    }
-                  },
-                  "parameters": {
-                    "virtualNetworkId": {
-                      "type": "string"
-                    }
-                  },
-                  "resources": [
-                    {
-                      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-                      "apiVersion": "2020-06-01",
-                      "name": "[format('privatelink.api.azureml.ms/{0}', uniqueString(parameters('virtualNetworkId')))]",
-                      "location": "global",
-                      "properties": {
-                        "virtualNetwork": {
-                          "id": "[parameters('virtualNetworkId')]"
-                        },
-                        "registrationEnabled": false
-                      }
-                    },
-                    {
-                      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-                      "apiVersion": "2020-06-01",
-                      "name": "[format('privatelink.notebooks.azure.net/{0}', uniqueString(parameters('virtualNetworkId')))]",
-                      "location": "global",
-                      "properties": {
-                        "virtualNetwork": {
-                          "id": "[parameters('virtualNetworkId')]"
-                        },
-                        "registrationEnabled": false
-                      }
-                    }
-                  ]
-                }
+                "registrationEnabled": false
               },
               "dependsOn": [
-                "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', parameters('aiHubName')))]"
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.notebooks.azure.net')]"
               ]
             },
             {
-              "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
-              "name": "[format('{0}-dnsZoneGroup', parameters('aiHubName'))]",
+              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+              "apiVersion": "2023-11-01",
+              "name": "[format('{0}/{1}', variables('privateEndpointName'), 'default')]",
               "properties": {
-                "expressionEvaluationOptions": {
-                  "scope": "inner"
-                },
-                "mode": "Incremental",
-                "parameters": {
-                  "privateEndpointName": {
-                    "value": "[variables('privateEndpointName')]"
+                "privateDnsZoneConfigs": [
+                  {
+                    "name": "privatelink-api-azureml-ms",
+                    "properties": {
+                      "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.api.azureml.ms')]"
+                    }
                   },
-                  "apiDnsZoneId": {
-                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', parameters('aiHubName'))), '2022-09-01').outputs.apiDnsZoneId.value]"
-                  },
-                  "notebookDnsZoneId": {
-                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', parameters('aiHubName'))), '2022-09-01').outputs.notebookDnsZoneId.value]"
+                  {
+                    "name": "privatelink-notebooks-azure-net",
+                    "properties": {
+                      "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.notebooks.azure.net')]"
+                    }
                   }
-                },
-                "template": {
-                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "contentVersion": "1.0.0.0",
-                  "metadata": {
-                    "_generator": {
-                      "name": "bicep",
-                      "version": "0.28.1.47646",
-                      "templateHash": "2149165544072699430"
-                    }
-                  },
-                  "parameters": {
-                    "privateEndpointName": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Name for the endpoint"
-                      }
-                    },
-                    "notebookDnsZoneId": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Dns Zone ID for notebook private link"
-                      }
-                    },
-                    "apiDnsZoneId": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Dns Zone ID for API private link"
-                      }
-                    }
-                  },
-                  "resources": [
-                    {
-                      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-                      "apiVersion": "2023-11-01",
-                      "name": "[format('{0}/default', parameters('privateEndpointName'))]",
-                      "properties": {
-                        "privateDnsZoneConfigs": [
-                          {
-                            "name": "privatelink-api-azureml-ms",
-                            "properties": {
-                              "privateDnsZoneId": "[parameters('apiDnsZoneId')]"
-                            }
-                          },
-                          {
-                            "name": "privatelink-notebooks-azure-net",
-                            "properties": {
-                              "privateDnsZoneId": "[parameters('notebookDnsZoneId')]"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
+                ]
               },
               "dependsOn": [
-                "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnetRgName')), 'Microsoft.Resources/deployments', format('{0}-DNS', parameters('aiHubName')))]",
-                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]",
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.api.azureml.ms')]",
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.notebooks.azure.net')]"
               ]
             }
           ],
