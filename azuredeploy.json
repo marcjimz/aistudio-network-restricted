@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "3935836087440828724"
+      "templateHash": "7469193339488646845"
     }
   },
   "parameters": {
@@ -107,7 +107,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "10442517667369450834"
+              "templateHash": "2583569664415719251"
             }
           },
           "parameters": {
@@ -668,7 +668,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.28.1.47646",
-                      "templateHash": "1301224795651372772"
+                      "templateHash": "1462651214127680919"
                     }
                   },
                   "parameters": {
@@ -710,12 +710,9 @@
                     },
                     "aiServiceSkuName": {
                       "type": "string",
-                      "defaultValue": "F0",
+                      "defaultValue": "S0",
                       "allowedValues": [
-                        "F0",
-                        "S1",
-                        "S2",
-                        "S3"
+                        "S0"
                       ],
                       "metadata": {
                         "description": "AI service SKU"

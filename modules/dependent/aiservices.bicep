@@ -18,14 +18,11 @@ param subnetId string
 param virtualNetworkId string
 
 @allowed([
-  'F0'
-  'S1'
-  'S2'
-  'S3'
+  'S0'
 ])
 
 @description('AI service SKU')
-param aiServiceSkuName string = 'F0'
+param aiServiceSkuName string = 'S0'
 
 var aiServiceNameCleaned = replace(aiServiceName, '-', '')
 
