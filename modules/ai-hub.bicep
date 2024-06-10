@@ -132,7 +132,7 @@ resource privateLinkNotebooks 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 
 resource vnetLinkApi 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: privateLinkApi
-  name: uniqueString(vnetResourceId)
+  name: '${uniqueString(vnetResourceId)}-api'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -144,7 +144,7 @@ resource vnetLinkApi 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020
 
 resource vnetLinkNotebooks 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: privateLinkNotebooks
-  name: uniqueString(vnetResourceId)
+  name: '${uniqueString(vnetResourceId)}-notebooks'
   location: 'global'
   properties: {
     virtualNetwork: {
@@ -175,6 +175,10 @@ resource dnsZoneGroupAiHub 'Microsoft.Network/privateEndpoints/privateDnsZoneGro
       }
     ]
   }
+  dependsOn: [
+    vnetLinkApi
+    vnetLinkNotebooks
+  ]
 }
 
 output aiHubID string = aiHub.id

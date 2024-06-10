@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "7469193339488646845"
+      "templateHash": "96457454374668582"
     }
   },
   "parameters": {
@@ -1244,7 +1244,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "15013335611457403766"
+              "templateHash": "17862590385203822728"
             }
           },
           "parameters": {
@@ -1430,7 +1430,7 @@
             {
               "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
               "apiVersion": "2020-06-01",
-              "name": "[format('{0}/{1}', 'privatelink.api.azureml.ms', uniqueString(parameters('vnetResourceId')))]",
+              "name": "[format('{0}/{1}', 'privatelink.api.azureml.ms', format('{0}-api', uniqueString(parameters('vnetResourceId'))))]",
               "location": "global",
               "properties": {
                 "virtualNetwork": {
@@ -1445,7 +1445,7 @@
             {
               "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
               "apiVersion": "2020-06-01",
-              "name": "[format('{0}/{1}', 'privatelink.notebooks.azure.net', uniqueString(parameters('vnetResourceId')))]",
+              "name": "[format('{0}/{1}', 'privatelink.notebooks.azure.net', format('{0}-notebooks', uniqueString(parameters('vnetResourceId'))))]",
               "location": "global",
               "properties": {
                 "virtualNetwork": {
@@ -1480,7 +1480,9 @@
               "dependsOn": [
                 "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]",
                 "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.api.azureml.ms')]",
-                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.notebooks.azure.net')]"
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.notebooks.azure.net')]",
+                "[resourceId('Microsoft.Network/privateDnsZones/virtualNetworkLinks', 'privatelink.api.azureml.ms', format('{0}-api', uniqueString(parameters('vnetResourceId'))))]",
+                "[resourceId('Microsoft.Network/privateDnsZones/virtualNetworkLinks', 'privatelink.notebooks.azure.net', format('{0}-notebooks', uniqueString(parameters('vnetResourceId'))))]"
               ]
             }
           ],
