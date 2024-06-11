@@ -64,7 +64,7 @@ resource aiServicePrivateEndpoint 'Microsoft.Network/privateEndpoints@2022-01-01
         name: aiServicePleName
         properties: {
           groupIds: [
-            'aiservice'
+            'accounts'
           ]
           privateLinkServiceId: aiServices.id
           privateLinkServiceConnectionState: {
