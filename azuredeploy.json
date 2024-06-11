@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "15756303214770638154"
+      "templateHash": "9893607635490812345"
     }
   },
   "parameters": {
@@ -107,7 +107,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "13612491093895462847"
+              "templateHash": "13142673508266972695"
             }
           },
           "parameters": {
@@ -648,11 +648,8 @@
                   "aiServiceName": {
                     "value": "[format('ai{0}{1}', variables('name'), variables('uniqueSuffix'))]"
                   },
-                  "cognitiveServicesPleName": {
-                    "value": "[format('ple-{0}-{1}-cognitiveServices', variables('name'), variables('uniqueSuffix'))]"
-                  },
-                  "openAiPleName": {
-                    "value": "[format('ple-{0}-{1}-openAi', variables('name'), variables('uniqueSuffix'))]"
+                  "aiServicesPleName": {
+                    "value": "[format('ple-{0}-{1}-ais', variables('name'), variables('uniqueSuffix'))]"
                   },
                   "subnetId": {
                     "value": "[parameters('subnetResourceId')]"
@@ -671,7 +668,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.28.1.47646",
-                      "templateHash": "11166181558016042466"
+                      "templateHash": "13715013168469906113"
                     }
                   },
                   "parameters": {
@@ -693,16 +690,10 @@
                         "description": "Name of the AI service"
                       }
                     },
-                    "cognitiveServicesPleName": {
+                    "aiServicesPleName": {
                       "type": "string",
                       "metadata": {
                         "description": "Name of the AI service private link endpoint for cognitive services"
-                      }
-                    },
-                    "openAiPleName": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Name of the AI service private link endpoint for openai"
                       }
                     },
                     "subnetId": {
@@ -764,54 +755,18 @@
                     {
                       "type": "Microsoft.Network/privateEndpoints",
                       "apiVersion": "2022-01-01",
-                      "name": "[parameters('cognitiveServicesPleName')]",
+                      "name": "[parameters('aiServicesPleName')]",
                       "location": "[parameters('location')]",
                       "tags": "[parameters('tags')]",
                       "properties": {
                         "privateLinkServiceConnections": [
                           {
-                            "name": "[parameters('cognitiveServicesPleName')]",
+                            "name": "[parameters('aiServicesPleName')]",
                             "properties": {
                               "groupIds": [
                                 "account"
                               ],
-                              "privateLinkServiceId": "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]",
-                              "privateLinkServiceConnectionState": {
-                                "status": "Approved",
-                                "description": "Auto-Approved",
-                                "actionsRequired": "None"
-                              }
-                            }
-                          }
-                        ],
-                        "subnet": {
-                          "id": "[parameters('subnetId')]"
-                        }
-                      },
-                      "dependsOn": [
-                        "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]"
-                      ]
-                    },
-                    {
-                      "type": "Microsoft.Network/privateEndpoints",
-                      "apiVersion": "2022-01-01",
-                      "name": "[parameters('openAiPleName')]",
-                      "location": "[parameters('location')]",
-                      "tags": "[parameters('tags')]",
-                      "properties": {
-                        "privateLinkServiceConnections": [
-                          {
-                            "name": "[parameters('openAiPleName')]",
-                            "properties": {
-                              "groupIds": [
-                                "openai"
-                              ],
-                              "privateLinkServiceId": "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]",
-                              "privateLinkServiceConnectionState": {
-                                "status": "Approved",
-                                "description": "Auto-Approved",
-                                "actionsRequired": "None"
-                              }
+                              "privateLinkServiceId": "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]"
                             }
                           }
                         ],
@@ -830,78 +785,57 @@
                       "location": "global"
                     },
                     {
-                      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-                      "apiVersion": "2022-01-01",
-                      "name": "[format('{0}/{1}', parameters('cognitiveServicesPleName'), 'blob-PrivateDnsZoneGroup')]",
-                      "properties": {
-                        "privateDnsZoneConfigs": [
-                          {
-                            "name": "[variables('cognitiveServicesPrivateDnsZoneName')]",
-                            "properties": {
-                              "privateDnsZoneId": "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]"
-                            }
-                          }
-                        ]
-                      },
-                      "dependsOn": [
-                        "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]",
-                        "[resourceId('Microsoft.Network/privateEndpoints', parameters('cognitiveServicesPleName'))]"
-                      ]
-                    },
-                    {
-                      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-                      "apiVersion": "2020-06-01",
-                      "name": "[format('{0}/{1}', variables('cognitiveServicesPrivateDnsZoneName'), uniqueString(resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))))]",
-                      "location": "global",
-                      "properties": {
-                        "registrationEnabled": false,
-                        "virtualNetwork": {
-                          "id": "[parameters('virtualNetworkId')]"
-                        }
-                      },
-                      "dependsOn": [
-                        "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]",
-                        "[resourceId('Microsoft.Network/privateDnsZones', variables('cognitiveServicesPrivateDnsZoneName'))]"
-                      ]
-                    },
-                    {
                       "type": "Microsoft.Network/privateDnsZones",
                       "apiVersion": "2020-06-01",
                       "name": "[variables('openAiPrivateDnsZoneName')]",
                       "location": "global"
                     },
                     {
-                      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-                      "apiVersion": "2022-01-01",
-                      "name": "[format('{0}/{1}', parameters('openAiPleName'), 'flie-PrivateDnsZoneGroup')]",
-                      "properties": {
-                        "privateDnsZoneConfigs": [
-                          {
-                            "name": "[variables('openAiPrivateDnsZoneName')]",
-                            "properties": {
-                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('openAiPrivateDnsZoneName'))]"
-                            }
-                          }
-                        ]
-                      },
-                      "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateDnsZones', variables('openAiPrivateDnsZoneName'))]",
-                        "[resourceId('Microsoft.Network/privateEndpoints', parameters('openAiPleName'))]"
-                      ]
-                    },
-                    {
                       "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
                       "apiVersion": "2020-06-01",
-                      "name": "[format('{0}/{1}', variables('openAiPrivateDnsZoneName'), uniqueString(resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))))]",
+                      "name": "[format('{0}/{1}', variables('cognitiveServicesPrivateDnsZoneName'), uniqueString(parameters('virtualNetworkId')))]",
                       "location": "global",
                       "properties": {
                         "registrationEnabled": false,
                         "virtualNetwork": {
                           "id": "[parameters('virtualNetworkId')]"
                         }
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+                      "apiVersion": "2020-06-01",
+                      "name": "[format('{0}/{1}', variables('openAiPrivateDnsZoneName'), uniqueString(parameters('virtualNetworkId')))]",
+                      "location": "global",
+                      "properties": {
+                        "registrationEnabled": false,
+                        "virtualNetwork": {
+                          "id": "[parameters('virtualNetworkId')]"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+                      "apiVersion": "2022-01-01",
+                      "name": "[format('{0}/default', parameters('aiServicesPleName'))]",
+                      "properties": {
+                        "privateDnsZoneConfigs": [
+                          {
+                            "name": "[replace(variables('openAiPrivateDnsZoneName'), '.', '-')]",
+                            "properties": {
+                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('openAiPrivateDnsZoneName'))]"
+                            }
+                          },
+                          {
+                            "name": "[replace(variables('cognitiveServicesPrivateDnsZoneName'), '.', '-')]",
+                            "properties": {
+                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('cognitiveServicesPrivateDnsZoneName'))]"
+                            }
+                          }
+                        ]
                       },
                       "dependsOn": [
-                        "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]",
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('cognitiveServicesPrivateDnsZoneName'))]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('openAiPrivateDnsZoneName'))]"
                       ]
                     }

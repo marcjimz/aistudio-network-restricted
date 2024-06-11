@@ -62,8 +62,7 @@ module aiServices 'dependent/aiservices.bicep' = {
   params: {
     location: location
     aiServiceName: 'ai${name}${uniqueSuffix}'
-    cognitiveServicesPleName: 'ple-${name}-${uniqueSuffix}-cognitiveServices'
-    openAiPleName: 'ple-${name}-${uniqueSuffix}-openAi'
+    aiServicesPleName: 'ple-${name}-${uniqueSuffix}-ais'
     subnetId: subnetResourceId
     virtualNetworkId: vnetResourceId
     tags: tags
