@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "1363772176395303540"
+      "templateHash": "7299224279677434067"
     }
   },
   "parameters": {
@@ -107,7 +107,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "12932722757923604349"
+              "templateHash": "16235852533580330998"
             }
           },
           "parameters": {
@@ -649,7 +649,7 @@
                     "value": "[format('ai{0}{1}', variables('name'), variables('uniqueSuffix'))]"
                   },
                   "aiServicePleName": {
-                    "value": "[format('ple-{0}-{1}-cr', variables('name'), variables('uniqueSuffix'))]"
+                    "value": "[format('ple-{0}-{1}-accounts', variables('name'), variables('uniqueSuffix'))]"
                   },
                   "subnetId": {
                     "value": "[parameters('subnetResourceId')]"
