@@ -8,8 +8,11 @@ param tags object
 @description('Name of the AI service')
 param aiServiceName string
 
-@description('Name of the AI service private link endpoint')
-param aiServicePleName string
+@description('Name of the AI service private link endpoint for cognitive services')
+param cognitiveServicesPleName string
+
+@description('Name of the AI service private link endpoint for openai')
+param openAiPleName string
 
 @description('Resource ID of the subnet')
 param subnetId string
@@ -26,7 +29,8 @@ param aiServiceSkuName string = 'S0'
 
 var aiServiceNameCleaned = replace(aiServiceName, '-', '')
 
-var aiServicePrivateDnsZoneName = 'privatelink.cognitiveservices.azure.com'
+var cognitiveServicesPrivateDnsZoneName = 'privatelink.cognitiveservices.azure.com'
+var openAiPrivateDnsZoneName = 'privatelink.openai.azure.com'
 
 resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: aiServiceNameCleaned
@@ -34,9 +38,9 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   sku: {
     name: aiServiceSkuName
   }
-  kind: 'AIServices' // or 'OpenAI'
+  kind: 'AIServices'
   properties: {
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     apiProperties: {
       statisticsEnabled: false
     }
@@ -54,17 +58,17 @@ resource aiServices 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   }
 }
 
-resource aiServicePrivateEndpoint 'Microsoft.Network/privateEndpoints@2022-01-01' = {
-  name: aiServicePleName
+resource cognitiveServicesPrivateEndpoint 'Microsoft.Network/privateEndpoints@2022-01-01' = {
+  name: cognitiveServicesPleName
   location: location
   tags: tags
   properties: {
     privateLinkServiceConnections: [
       { 
-        name: aiServicePleName
+        name: cognitiveServicesPleName
         properties: {
           groupIds: [
-            'accounts'
+            'blob'
           ]
           privateLinkServiceId: aiServices.id
           privateLinkServiceConnectionState: {
@@ -81,28 +85,55 @@ resource aiServicePrivateEndpoint 'Microsoft.Network/privateEndpoints@2022-01-01
   }
 }
 
-resource aiServicePrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: aiServicePrivateDnsZoneName
+resource openAiPrivateEndpoint 'Microsoft.Network/privateEndpoints@2022-01-01' = {
+  name: openAiPleName
+  location: location
+  tags: tags
+  properties: {
+    privateLinkServiceConnections: [
+      {
+        name: openAiPleName
+        properties: {
+          groupIds: [
+            'file'
+          ]
+          privateLinkServiceId: aiServices.id
+          privateLinkServiceConnectionState: {
+            status: 'Approved'
+            description: 'Auto-Approved'
+            actionsRequired: 'None'
+          }
+        }
+      }
+    ]
+    subnet: {
+      id: subnetId
+    }
+  }
+}
+
+resource cognitiveServicesPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: cognitiveServicesPrivateDnsZoneName
   location: 'global'
 }
 
-resource aiServicePrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
-  parent: aiServicePrivateEndpoint
-  name: 'aiservice-PrivateDnsZoneGroup'
+resource cognitiveServicesPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
+  parent: cognitiveServicesPrivateEndpoint
+  name: 'blob-PrivateDnsZoneGroup'
   properties:{
     privateDnsZoneConfigs: [
       {
-        name: aiServicePrivateDnsZoneName
+        name: cognitiveServicesPrivateDnsZoneName
         properties:{
-          privateDnsZoneId: aiServicePrivateDnsZone.id
+          privateDnsZoneId: aiServices.id
         }
       }
     ]
   }
 }
 
-resource aiServicePrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: aiServicePrivateDnsZone
+resource cognitiveServicesVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: cognitiveServicesPrivateDnsZone
   name: uniqueString(aiServices.id)
   location: 'global'
   properties: {
@@ -112,6 +143,40 @@ resource aiServicePrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virt
     }
   }
 }
+
+resource openAiPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: openAiPrivateDnsZoneName
+  location: 'global'
+}
+
+resource openAiPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
+  parent: openAiPrivateEndpoint
+  name: 'flie-PrivateDnsZoneGroup'
+  properties:{
+    privateDnsZoneConfigs: [
+      {
+        name: openAiPrivateDnsZoneName
+        properties:{
+          privateDnsZoneId: openAiPrivateDnsZone.id
+        }
+      }
+    ]
+  }
+}
+
+resource openAiVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  parent: openAiPrivateDnsZone
+  name: uniqueString(aiServices.id)
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: virtualNetworkId
+    }
+  }
+}
+
+
 
 output aiServicesId string = aiServices.id
 output aiServicesEndpoint string = aiServices.properties.endpoint

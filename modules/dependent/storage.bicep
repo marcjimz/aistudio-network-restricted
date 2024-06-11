@@ -149,7 +149,7 @@ resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   location: 'global'
 }
 
-resource privateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
+resource blobPrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
   parent: storagePrivateEndpointBlob
   name: 'blob-PrivateDnsZoneGroup'
   properties:{
