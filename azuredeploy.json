@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "11463854818962287866"
+      "templateHash": "15756303214770638154"
     }
   },
   "parameters": {
@@ -107,7 +107,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "11440705042226348067"
+              "templateHash": "13612491093895462847"
             }
           },
           "parameters": {
@@ -671,7 +671,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.28.1.47646",
-                      "templateHash": "16397235432931532438"
+                      "templateHash": "11166181558016042466"
                     }
                   },
                   "parameters": {
@@ -773,7 +773,7 @@
                             "name": "[parameters('cognitiveServicesPleName')]",
                             "properties": {
                               "groupIds": [
-                                "blob"
+                                "account"
                               ],
                               "privateLinkServiceId": "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]",
                               "privateLinkServiceConnectionState": {
@@ -804,7 +804,7 @@
                             "name": "[parameters('openAiPleName')]",
                             "properties": {
                               "groupIds": [
-                                "file"
+                                "openai"
                               ],
                               "privateLinkServiceId": "[resourceId('Microsoft.CognitiveServices/accounts', variables('aiServiceNameCleaned'))]",
                               "privateLinkServiceConnectionState": {

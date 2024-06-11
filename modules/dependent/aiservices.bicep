@@ -68,7 +68,7 @@ resource cognitiveServicesPrivateEndpoint 'Microsoft.Network/privateEndpoints@20
         name: cognitiveServicesPleName
         properties: {
           groupIds: [
-            'blob'
+            'account'
           ]
           privateLinkServiceId: aiServices.id
           privateLinkServiceConnectionState: {
@@ -94,9 +94,9 @@ resource openAiPrivateEndpoint 'Microsoft.Network/privateEndpoints@2022-01-01' =
       {
         name: openAiPleName
         properties: {
-          groupIds: [
-            'file'
-          ]
+            groupIds: [
+            'openai'
+            ]
           privateLinkServiceId: aiServices.id
           privateLinkServiceConnectionState: {
             status: 'Approved'
