@@ -88,7 +88,8 @@ resource openAiPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 }
 
 resource cognitiveServicesVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${cognitiveServicesPrivateDnsZoneName}/${uniqueString(virtualNetworkId)}'
+  parent: cognitiveServicesPrivateDnsZone
+  name: uniqueString(virtualNetworkId)
   location: 'global'
   properties: {
     registrationEnabled: false
@@ -99,7 +100,8 @@ resource cognitiveServicesVnetLink 'Microsoft.Network/privateDnsZones/virtualNet
 }
 
 resource openAiVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  name: '${openAiPrivateDnsZoneName}/${uniqueString(virtualNetworkId)}'
+  parent: openAiPrivateDnsZone
+  name: uniqueString(virtualNetworkId)
   location: 'global'
   properties: {
     registrationEnabled: false
@@ -110,7 +112,8 @@ resource openAiVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2
 }
 
 resource aiServicesPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = {
-  name: '${aiServicesPleName}/default'
+  parent: aiServicesPrivateEndpoint
+  name: 'default'
   properties:{
     privateDnsZoneConfigs: [
       {

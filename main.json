@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "9893607635490812345"
+      "templateHash": "10942501564861112363"
     }
   },
   "parameters": {
@@ -107,7 +107,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "13142673508266972695"
+              "templateHash": "9783824682462461747"
             }
           },
           "parameters": {
@@ -668,7 +668,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.28.1.47646",
-                      "templateHash": "13715013168469906113"
+                      "templateHash": "4225410054772661446"
                     }
                   },
                   "parameters": {
@@ -800,7 +800,10 @@
                         "virtualNetwork": {
                           "id": "[parameters('virtualNetworkId')]"
                         }
-                      }
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('cognitiveServicesPrivateDnsZoneName'))]"
+                      ]
                     },
                     {
                       "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
@@ -812,12 +815,15 @@
                         "virtualNetwork": {
                           "id": "[parameters('virtualNetworkId')]"
                         }
-                      }
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateDnsZones', variables('openAiPrivateDnsZoneName'))]"
+                      ]
                     },
                     {
                       "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
                       "apiVersion": "2022-01-01",
-                      "name": "[format('{0}/default', parameters('aiServicesPleName'))]",
+                      "name": "[format('{0}/{1}', parameters('aiServicesPleName'), 'default')]",
                       "properties": {
                         "privateDnsZoneConfigs": [
                           {
@@ -835,6 +841,7 @@
                         ]
                       },
                       "dependsOn": [
+                        "[resourceId('Microsoft.Network/privateEndpoints', parameters('aiServicesPleName'))]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('cognitiveServicesPrivateDnsZoneName'))]",
                         "[resourceId('Microsoft.Network/privateDnsZones', variables('openAiPrivateDnsZoneName'))]"
                       ]
