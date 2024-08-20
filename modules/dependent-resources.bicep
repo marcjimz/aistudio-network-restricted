@@ -103,6 +103,9 @@ output containerRegistryId string = containerRegistry.outputs.containerRegistryI
 output applicationInsightsId string = applicationInsights.outputs.applicationInsightsId
 output searchServiceId string = searchService.outputs.searchServiceId
 
+output aiServicesPrincipalId string = aiServices.outputs.aiServicesPrincipalId
+output searchServicePrincipalId string = searchService.outputs.searchServicePrincipalId
+
 output aiservicesName string = aiServices.outputs.aiServicesName
 output searchServiceName string = searchService.outputs.searchServiceName
 output storageName string = storage.outputs.storageName

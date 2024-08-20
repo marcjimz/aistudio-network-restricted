@@ -115,4 +115,5 @@ resource searchPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtual
 }
 
 output searchServiceId string = searchService.id
+output searchServicePrincipalId string = searchService.identity.principalId
 output searchServiceName string = searchService.name

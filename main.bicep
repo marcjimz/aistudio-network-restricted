@@ -57,9 +57,9 @@ module aiDependencies 'modules/dependent-resources.bicep' = {
 module roleAssignments 'modules/role-assignments.bicep' = {
   name: 'role-assignments-${name}-${uniqueSuffix}-deployment'
   params: {
-    aiServicesId: aiDependencies.outputs.aiservicesID
+    aiServicesPrincipalId: aiDependencies.outputs.aiServicesPrincipalId
     aiServicesName: aiDependencies.outputs.aiservicesName
-    searchServiceId: aiDependencies.outputs.searchServiceId
+    searchServicePrincipalId: aiDependencies.outputs.searchServicePrincipalId
     searchServiceName: aiDependencies.outputs.searchServiceName
     storageName: aiDependencies.outputs.storageName
   }

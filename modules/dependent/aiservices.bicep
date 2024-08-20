@@ -142,3 +142,4 @@ resource aiServicesPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/priva
 output aiServicesId string = aiServices.id
 output aiServicesEndpoint string = aiServices.properties.endpoint
 output aiServicesName string = aiServices.name
+output aiServicesPrincipalId string = aiServices.identity.principalId
