@@ -125,7 +125,7 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-07-01-preview'
 
       // Conditionally include the credentials section if authType is apiKey
       credentials: connectionAuthMode == 'ApiKey' ? {
-        key: '${listAdminKeys(searchId, '2015-08-19').PrimaryKey}'
+        key: '${listAdminKeys(searchId, '2023-11-01').primaryKey}'
       } : null
 
       metadata: {
