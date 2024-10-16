@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "841881792354590583"
+      "templateHash": "7679690001048236126"
     }
   },
   "parameters": {
@@ -1710,7 +1710,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "15402366177816525784"
+              "templateHash": "3307063723839192514"
             }
           },
           "parameters": {
@@ -1863,6 +1863,7 @@
                 "target": "[parameters('searchTarget')]",
                 "authType": "[parameters('connectionAuthMode')]",
                 "isSharedToAll": true,
+                "credentials": "[if(equals(parameters('connectionAuthMode'), 'ApiKey'), createObject('key', format('{0}', listAdminKeys(parameters('searchId'), '2015-08-19').PrimaryKey)), null())]",
                 "metadata": {
                   "ApiType": "Azure",
                   "ResourceId": "[parameters('searchId')]"

@@ -124,9 +124,9 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-07-01-preview'
       isSharedToAll: true
 
       // Conditionally include the credentials section if authType is apiKey
-      // credentials: connectionAuthMode == 'ApiKey' ? {
-      //   key: '${listKeys(searchId, '2023-11-01').primaryKey}'
-      // } : null
+      credentials: connectionAuthMode == 'ApiKey' ? {
+        key: '${listAdminKeys(searchId, '2015-08-19').PrimaryKey}'
+      } : null
 
       metadata: {
         ApiType: 'Azure'
