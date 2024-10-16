@@ -63,7 +63,7 @@ var targetSubResource = [
     'amlworkspace'
 ]
 
-resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-04-01-preview' = {
+resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-07-01-preview' = {
   name: aiHubName
   location: location
   tags: tags
@@ -124,9 +124,9 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-04-01-preview'
       isSharedToAll: true
 
       // Conditionally include the credentials section if authType is apiKey
-      credentials: connectionAuthMode == 'ApiKey' ? {
-        key: '${listKeys(searchId, '2023-11-01').primaryKey}'
-      } : null
+      // credentials: connectionAuthMode == 'ApiKey' ? {
+      //   key: '${listKeys(searchId, '2023-11-01').primaryKey}'
+      // } : null
 
       metadata: {
         ApiType: 'Azure'
