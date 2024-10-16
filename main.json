@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "3278806440917955104"
+      "templateHash": "1094289827596347216"
     }
   },
   "parameters": {
@@ -135,7 +135,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "3302622018044117886"
+              "templateHash": "1239143811445030312"
             }
           },
           "parameters": {
@@ -1260,7 +1260,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.30.23.60470",
-                      "templateHash": "15380434404905617810"
+                      "templateHash": "1077835677857836342"
                     }
                   },
                   "parameters": {
@@ -1435,7 +1435,7 @@
                     },
                     "searchServiceEndpoint": {
                       "type": "string",
-                      "value": "[format('https://{0}.search.windows.net', parameters('searchServiceName'))]"
+                      "value": "[format('https://{0}.search.windows.net/', parameters('searchServiceName'))]"
                     }
                   }
                 }
@@ -1710,7 +1710,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "14485468520905866195"
+              "templateHash": "2576713776330241098"
             }
           },
           "parameters": {
@@ -1857,16 +1857,16 @@
             {
               "type": "Microsoft.MachineLearningServices/workspaces/connections",
               "apiVersion": "2024-07-01-preview",
-              "name": "[format('{0}/{1}', parameters('aiHubName'), format('{0}-connection-OpenAI', parameters('aiHubName')))]",
+              "name": "[format('{0}/{1}', parameters('aiHubName'), format('{0}-connection-Search', parameters('aiHubName')))]",
               "properties": {
-                "category": "AzureOpenAI",
-                "target": "[parameters('aiServicesTarget')]",
+                "category": "CognitiveSearch",
+                "target": "[parameters('searchTarget')]",
                 "authType": "[parameters('connectionAuthMode')]",
                 "isSharedToAll": true,
-                "credentials": "[if(equals(parameters('connectionAuthMode'), 'ApiKey'), createObject('key', format('{0}', listKeys(parameters('aiServicesId'), '2021-10-01').key1)), null())]",
+                "credentials": "[if(equals(parameters('connectionAuthMode'), 'ApiKey'), createObject('key', format('{0}', listKeys(parameters('searchId'), '2023-11-01').primaryKey)), null())]",
                 "metadata": {
                   "ApiType": "Azure",
-                  "ResourceId": "[parameters('aiServicesId')]"
+                  "ResourceId": "[parameters('searchId')]"
                 }
               },
               "dependsOn": [
