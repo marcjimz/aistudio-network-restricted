@@ -103,6 +103,10 @@ module aiHub 'modules/ai-hub.bicep' = {
     containerRegistryId: aiDependencies.outputs.containerRegistryId
     keyVaultId: aiDependencies.outputs.keyvaultId
     storageAccountId: aiDependencies.outputs.storageId
+    searchId: aiDependencies.outputs.searchServiceId
+    searchTarget: aiDependencies.outputs.searchServiceTarget
+
+    //configuration settings
     systemDatastoresAuthMode: systemDatastoresAuthMode
     connectionAuthMode: connectionAuthMode
 
