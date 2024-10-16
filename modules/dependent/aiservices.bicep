@@ -19,7 +19,6 @@ param virtualNetworkId string
 @allowed([
   'S0'
 ])
-
 @description('AI service SKU')
 param aiServiceSkuName string = 'S0'
 

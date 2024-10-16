@@ -115,25 +115,25 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-04-01-preview'
   }
 
   // Azure Search connection
-  resource searchServiceConnection 'connections@2024-07-01-preview' = {
-    name: '${aiHubName}-connection-Search'
-    properties: {
-      category: 'CognitiveSearch'
-      target: searchTarget
-      authType: connectionAuthMode
-      isSharedToAll: true
+  // resource searchServiceConnection 'connections@2024-07-01-preview' = {
+  //   name: '${aiHubName}-connection-Search'
+  //   properties: {
+  //     category: 'CognitiveSearch'
+  //     target: searchTarget
+  //     authType: connectionAuthMode
+  //     isSharedToAll: true
 
-      // Conditionally include the credentials section if authType is apiKey
-      credentials: connectionAuthMode == 'ApiKey' ? {
-        key: '${listKeys(searchId, '2023-11-01').key1}'
-      } : null
+  //     // Conditionally include the credentials section if authType is apiKey
+  //     credentials: connectionAuthMode == 'ApiKey' ? {
+  //       key: '${listKeys(searchId, '2023-11-01').key1}'
+  //     } : null
 
-      metadata: {
-        ApiType: 'Azure'
-        ResourceId: searchId
-      }
-    }
-  }
+  //     metadata: {
+  //       ApiType: 'Azure'
+  //       ResourceId: searchId
+  //     }
+  //   }
+  // }
 
   // OpenAI connection
   resource openAiServiceConnection 'connections@2024-07-01-preview' = {
