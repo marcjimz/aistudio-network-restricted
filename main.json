@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "1047363991190005158"
+      "templateHash": "13876463594192649835"
     }
   },
   "parameters": {
@@ -93,6 +93,18 @@
       "metadata": {
         "description": "Determines whether to use an API key or Azure Active Directory (AAD) for the AI service connection authentication. The default value is apiKey."
       }
+    },
+    "searchRgGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group name for the existing search service. Keep empty if you want the template to provision."
+      }
+    },
+    "searchResourceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource name for the existing search service. Keep empty if you want the template to provision."
+      }
     }
   },
   "variables": {
@@ -102,6 +114,20 @@
     "subnetResourceId": "[format('{0}/subnets/{1}', variables('vnetResourceId'), parameters('subnetName'))]"
   },
   "resources": [
+    {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2020-10-01",
+      "name": "get-user-principal-id",
+      "location": "[resourceGroup().location]",
+      "kind": "AzureCLI",
+      "properties": {
+        "azCliVersion": "2.30.0",
+        "scriptContent": "      userPrincipalId=$(az ad signed-in-user show --query objectId -o tsv)\r\n      echo $userPrincipalId > $AZ_SCRIPTS_OUTPUT_PATH\r\n    ",
+        "timeout": "PT5M",
+        "retentionInterval": "PT1H",
+        "cleanupPreference": "OnSuccess"
+      }
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
@@ -126,6 +152,12 @@
           },
           "prefix": {
             "value": "[parameters('prefix')]"
+          },
+          "searchRgGroup": {
+            "value": "[parameters('searchRgGroup')]"
+          },
+          "searchResourceName": {
+            "value": "[parameters('searchResourceName')]"
           }
         },
         "template": {
@@ -135,7 +167,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "6657008507939231658"
+              "templateHash": "139273742234290671"
             }
           },
           "parameters": {
@@ -170,6 +202,20 @@
               "type": "string",
               "metadata": {
                 "description": "Resource Id of the virtual network to deploy the resource into."
+              }
+            },
+            "searchRgGroup": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Resource group name of the existing search service. Required if using an existing search service."
+              }
+            },
+            "searchResourceName": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Name of the existing search service. Required if using an existing search service."
               }
             }
           },
@@ -1251,6 +1297,12 @@
                   },
                   "tags": {
                     "value": "[parameters('tags')]"
+                  },
+                  "searchRgGroup": {
+                    "value": "[parameters('searchRgGroup')]"
+                  },
+                  "searchResourceName": {
+                    "value": "[parameters('searchResourceName')]"
                   }
                 },
                 "template": {
@@ -1260,7 +1312,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.30.23.60470",
-                      "templateHash": "4020527859442231537"
+                      "templateHash": "7678179421354579145"
                     }
                   },
                   "parameters": {
@@ -1314,13 +1366,31 @@
                       "metadata": {
                         "description": "Search SKU"
                       }
+                    },
+                    "searchRgGroup": {
+                      "type": "string",
+                      "defaultValue": "",
+                      "metadata": {
+                        "description": "Resource group name of the existing search service. Required if using an existing search service."
+                      }
+                    },
+                    "searchResourceName": {
+                      "type": "string",
+                      "defaultValue": "",
+                      "metadata": {
+                        "description": "Name of the existing search service. Required if using an existing search service."
+                      }
                     }
                   },
                   "variables": {
-                    "searchPrivateDnsZoneName": "privatelink.search.windows.net"
+                    "useExistingSearchService": "[and(not(empty(parameters('searchRgGroup'))), not(empty(parameters('searchResourceName'))))]",
+                    "searchServiceId": "[if(variables('useExistingSearchService'), extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('searchRgGroup')), 'Microsoft.Search/searchServices', parameters('searchResourceName')), resourceId('Microsoft.Search/searchServices', parameters('searchServiceName')))]",
+                    "searchServiceNameOutput": "[if(variables('useExistingSearchService'), parameters('searchResourceName'), parameters('searchServiceName'))]",
+                    "searchServiceEndpoint": "[format('https://{0}.search.windows.net', variables('searchServiceNameOutput'))]"
                   },
                   "resources": [
                     {
+                      "condition": "[not(variables('useExistingSearchService'))]",
                       "type": "Microsoft.Search/searchServices",
                       "apiVersion": "2024-06-01-preview",
                       "name": "[parameters('searchServiceName')]",
@@ -1349,6 +1419,7 @@
                       }
                     },
                     {
+                      "condition": "[not(variables('useExistingSearchService'))]",
                       "type": "Microsoft.Network/privateEndpoints",
                       "apiVersion": "2023-11-01",
                       "name": "[parameters('searchPrivateLinkName')]",
@@ -1362,7 +1433,7 @@
                               "groupIds": [
                                 "searchService"
                               ],
-                              "privateLinkServiceId": "[resourceId('Microsoft.Search/searchServices', parameters('searchServiceName'))]",
+                              "privateLinkServiceId": "[variables('searchServiceId')]",
                               "privateLinkServiceConnectionState": {
                                 "status": "Approved",
                                 "description": "Auto-Approved",
@@ -1380,34 +1451,37 @@
                       ]
                     },
                     {
+                      "condition": "[not(variables('useExistingSearchService'))]",
                       "type": "Microsoft.Network/privateDnsZones",
                       "apiVersion": "2020-06-01",
-                      "name": "[variables('searchPrivateDnsZoneName')]",
+                      "name": "privatelink.search.windows.net",
                       "location": "global"
                     },
                     {
+                      "condition": "[not(variables('useExistingSearchService'))]",
                       "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
                       "apiVersion": "2023-11-01",
                       "name": "[format('{0}/{1}', parameters('searchPrivateLinkName'), 'search-PrivateDnsZoneGroup')]",
                       "properties": {
                         "privateDnsZoneConfigs": [
                           {
-                            "name": "[variables('searchPrivateDnsZoneName')]",
+                            "name": "privatelink.search.windows.net",
                             "properties": {
-                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('searchPrivateDnsZoneName'))]"
+                              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.search.windows.net')]"
                             }
                           }
                         ]
                       },
                       "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateDnsZones', variables('searchPrivateDnsZoneName'))]",
+                        "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.search.windows.net')]",
                         "[resourceId('Microsoft.Network/privateEndpoints', parameters('searchPrivateLinkName'))]"
                       ]
                     },
                     {
+                      "condition": "[not(variables('useExistingSearchService'))]",
                       "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
                       "apiVersion": "2020-06-01",
-                      "name": "[format('{0}/{1}', variables('searchPrivateDnsZoneName'), uniqueString(resourceId('Microsoft.Search/searchServices', parameters('searchServiceName'))))]",
+                      "name": "[format('{0}/{1}', 'privatelink.search.windows.net', uniqueString(variables('searchServiceId')))]",
                       "location": "global",
                       "properties": {
                         "registrationEnabled": false,
@@ -1416,27 +1490,27 @@
                         }
                       },
                       "dependsOn": [
-                        "[resourceId('Microsoft.Network/privateDnsZones', variables('searchPrivateDnsZoneName'))]",
-                        "[resourceId('Microsoft.Search/searchServices', parameters('searchServiceName'))]"
+                        "[resourceId('Microsoft.Search/searchServices', parameters('searchServiceName'))]",
+                        "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.search.windows.net')]"
                       ]
                     }
                   ],
                   "outputs": {
                     "searchServiceId": {
                       "type": "string",
-                      "value": "[resourceId('Microsoft.Search/searchServices', parameters('searchServiceName'))]"
+                      "value": "[variables('searchServiceId')]"
                     },
                     "searchServicePrincipalId": {
                       "type": "string",
-                      "value": "[reference(resourceId('Microsoft.Search/searchServices', parameters('searchServiceName')), '2024-06-01-preview', 'full').identity.principalId]"
+                      "value": "[if(variables('useExistingSearchService'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('searchRgGroup')), 'Microsoft.Search/searchServices', parameters('searchResourceName')), '2024-06-01-preview', 'full').identity.principalId, reference(resourceId('Microsoft.Search/searchServices', parameters('searchServiceName')), '2024-06-01-preview', 'full').identity.principalId)]"
                     },
                     "searchServiceName": {
                       "type": "string",
-                      "value": "[parameters('searchServiceName')]"
+                      "value": "[variables('searchServiceNameOutput')]"
                     },
                     "searchServiceEndpoint": {
                       "type": "string",
-                      "value": "[format('https://{0}.search.windows.net', parameters('searchServiceName'))]"
+                      "value": "[variables('searchServiceEndpoint')]"
                     }
                   }
                 }
@@ -1572,7 +1646,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "1992089500611530508"
+              "templateHash": "7370999289924996503"
             }
           },
           "parameters": {
@@ -1698,7 +1772,8 @@
             "privateEndpointName": "[format('{0}-AIHub-PE', parameters('aiHubName'))]",
             "targetSubResource": [
               "amlworkspace"
-            ]
+            ],
+            "projectName": "demoproject"
           },
           "resources": [
             {
@@ -1739,6 +1814,19 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints/projects",
+              "apiVersion": "2024-10-01-preview",
+              "name": "[format('{0}/{1}', variables('privateEndpointName'), variables('projectName'))]",
+              "location": "[parameters('location')]",
+              "kind": "Project",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
               ]
             },
             {
@@ -1889,7 +1977,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('role-assignments-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))]",
+      "name": "[format('service-role-assignments-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -2054,6 +2142,183 @@
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]",
         "[resourceId('Microsoft.Resources/deployments', format('ai-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('user-role-assignment-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "aiHubName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('ai-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))), '2022-09-01').outputs.aiHubName.value]"
+          },
+          "aiServicesName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))), '2022-09-01').outputs.aiservicesName.value]"
+          },
+          "searchServiceName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))), '2022-09-01').outputs.searchServiceName.value]"
+          },
+          "storageName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))), '2022-09-01').outputs.storageName.value]"
+          },
+          "user": {
+            "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'get-user-principal-id'), '2020-10-01').outputs.output]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.30.23.60470",
+              "templateHash": "18095364988805668959"
+            }
+          },
+          "parameters": {
+            "aiHubName": {
+              "type": "string",
+              "metadata": {
+                "description": "AI Hub Name"
+              }
+            },
+            "aiServicesName": {
+              "type": "string",
+              "metadata": {
+                "description": "AI Services Name"
+              }
+            },
+            "searchServiceName": {
+              "type": "string",
+              "metadata": {
+                "description": "Search Service Name"
+              }
+            },
+            "storageName": {
+              "type": "string",
+              "metadata": {
+                "description": "Storage Name"
+              }
+            },
+            "user": {
+              "type": "string",
+              "metadata": {
+                "description": "Singular user email"
+              }
+            }
+          },
+          "variables": {
+            "roleId": {
+              "SearchIndexDataContributor": "8ebe5a00-799e-43f5-93ac-243d3dce84a7",
+              "SearchServiceContributor": "7ca78c08-252a-4471-8644-bb5ff32d4ba0",
+              "StorageAccountContributor": "17d1049b-9a84-46fb-8f53-869881c3d3ab",
+              "StorageBlobDataReader": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1",
+              "StorageBlobDataContributor": "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+              "CognitiveServicesContributor": "25fbc0a9-bd7c-42a3-aa1a-3b75d497ee68",
+              "CognitiveServicesOpenAiContributor": "a001fd3d-188f-4b5d-821b-7da978bf7442",
+              "StorageFileDataPrivilegedContributor": "69566ab7-960f-475b-8e7c-b3118f30c6bd"
+            },
+            "userRoles": [
+              {
+                "name": "SearchServiceContributor",
+                "scope": "searchService"
+              },
+              {
+                "name": "SearchIndexDataContributor",
+                "scope": "searchService"
+              },
+              {
+                "name": "CognitiveServicesOpenAiContributor",
+                "scope": "aiServices"
+              },
+              {
+                "name": "CognitiveServicesContributor",
+                "scope": "aiServices"
+              },
+              {
+                "name": "StorageBlobDataContributor",
+                "scope": "storage"
+              },
+              {
+                "name": "StorageFileDataPrivilegedContributor",
+                "scope": "storage"
+              }
+            ]
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Search/searchServices/{0}', parameters('searchServiceName'))]",
+              "name": "[guid(resourceId('Microsoft.Search/searchServices', parameters('searchServiceName')), variables('roleId').SearchServiceContributor, parameters('user'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId').SearchServiceContributor)]",
+                "principalId": "[parameters('user')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Search/searchServices/{0}', parameters('searchServiceName'))]",
+              "name": "[guid(resourceId('Microsoft.Search/searchServices', parameters('searchServiceName')), variables('roleId').SearchIndexDataContributor, parameters('user'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId').SearchIndexDataContributor)]",
+                "principalId": "[parameters('user')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.CognitiveServices/accounts/{0}', parameters('aiServicesName'))]",
+              "name": "[guid(resourceId('Microsoft.CognitiveServices/accounts', parameters('aiServicesName')), variables('roleId').CognitiveServicesOpenAiContributor, parameters('user'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId').CognitiveServicesOpenAiContributor)]",
+                "principalId": "[parameters('user')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.CognitiveServices/accounts/{0}', parameters('aiServicesName'))]",
+              "name": "[guid(resourceId('Microsoft.CognitiveServices/accounts', parameters('aiServicesName')), variables('roleId').CognitiveServicesContributor, parameters('user'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId').CognitiveServicesContributor)]",
+                "principalId": "[parameters('user')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageName'))]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')), variables('roleId').StorageBlobDataContributor, parameters('user'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId').StorageBlobDataContributor)]",
+                "principalId": "[parameters('user')]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageName'))]",
+              "name": "[guid(resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')), variables('roleId').StorageFileDataPrivilegedContributor, parameters('user'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('roleId').StorageFileDataPrivilegedContributor)]",
+                "principalId": "[parameters('user')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('ai-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deploymentScripts', 'get-user-principal-id')]",
+        "[resourceId('Microsoft.Resources/deployments', format('service-role-assignments-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]"
       ]
     }
   ]

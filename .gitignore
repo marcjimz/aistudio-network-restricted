@@ -1,4 +1,7 @@
 temp.bicep
 temp.json
 cleanup.sh
+build.sh
+deploy.sh
 nested_*.bicep
+.DS_Store

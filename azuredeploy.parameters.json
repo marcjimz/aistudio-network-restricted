@@ -25,6 +25,12 @@
       },
       "prefix": {
         "value": "GEN-UNIQUE-8"
+      },
+      "searchRgGroup": {
+        "value": ""
+      },
+      "searchResourceName": {
+        "value": ""
       }
   }
 }

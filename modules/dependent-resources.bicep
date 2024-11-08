@@ -16,6 +16,13 @@ param subnetResourceId string
 @description('Resource Id of the virtual network to deploy the resource into.')
 param vnetResourceId string
 
+@description('Resource group name of the existing search service. Required if using an existing search service.')
+param searchRgGroup string = ''
+
+@description('Name of the existing search service. Required if using an existing search service.')
+param searchResourceName string = ''
+
+
 // Variables
 var name = toLower('${prefix}')
 
@@ -92,6 +99,8 @@ module searchService 'dependent/aisearch.bicep' = {
     subnetId: subnetResourceId
     virtualNetworkId: vnetResourceId
     tags: tags
+    searchRgGroup: searchRgGroup
+    searchResourceName: searchResourceName
   }
 }
 

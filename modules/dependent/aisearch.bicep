@@ -27,9 +27,23 @@ param virtualNetworkId string
 ])
 param searchSkuName string = 'standard'
 
-var searchPrivateDnsZoneName = 'privatelink.search.windows.net'
+@description('Resource group name of the existing search service. Required if using an existing search service.')
+param searchRgGroup string = ''
 
-resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' = {
+@description('Name of the existing search service. Required if using an existing search service.')
+param searchResourceName string = ''
+
+// Variable to determine whether to use an existing search service
+var useExistingSearchService = !empty(searchRgGroup) && !empty(searchResourceName)
+
+// Reference to the existing search service (if applicable)
+resource existingSearchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = if (useExistingSearchService) {
+  name: searchResourceName
+  scope: resourceGroup(searchRgGroup)
+}
+
+// Definition for creating a new search service (only if not using existing)
+resource newSearchService 'Microsoft.Search/searchServices@2024-06-01-preview' = if (!useExistingSearchService) {
   name: searchServiceName
   location: location
   tags: tags
@@ -56,7 +70,14 @@ resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' = {
   }
 }
 
-resource searchPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
+// Variable to reference the active search service (existing or new)
+var searchServiceId = useExistingSearchService ? existingSearchService.id : newSearchService.id
+var searchServicePrincipalId = useExistingSearchService ? existingSearchService.identity.principalId : newSearchService.identity.principalId
+var searchServiceNameOutput = useExistingSearchService ? existingSearchService.name : newSearchService.name
+var searchServiceEndpoint = 'https://${searchServiceNameOutput}.search.windows.net'
+
+// Conditionally deploy private endpoint and DNS resources only when creating a new search service
+resource searchPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = if (!useExistingSearchService) {
   name: searchPrivateLinkName
   location: location
   tags: tags
@@ -68,7 +89,7 @@ resource searchPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' =
           groupIds: [
             'searchService'
           ]
-          privateLinkServiceId: searchService.id
+          privateLinkServiceId: searchServiceId
           privateLinkServiceConnectionState: {
             status: 'Approved'
             description: 'Auto-Approved'
@@ -83,18 +104,18 @@ resource searchPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' =
   }
 }
 
-resource searchPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: searchPrivateDnsZoneName
+resource searchPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = if (!useExistingSearchService) {
+  name: 'privatelink.search.windows.net'
   location: 'global'
 }
 
-resource searchPrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = {
+resource searchPrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = if (!useExistingSearchService) {
   parent: searchPrivateEndpoint
   name: 'search-PrivateDnsZoneGroup'
   properties: {
     privateDnsZoneConfigs: [
       {
-        name: searchPrivateDnsZoneName
+        name: 'privatelink.search.windows.net'
         properties: {
           privateDnsZoneId: searchPrivateDnsZone.id
         }
@@ -103,9 +124,9 @@ resource searchPrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDns
   }
 }
 
-resource searchPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+resource searchPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = if (!useExistingSearchService) {
   parent: searchPrivateDnsZone
-  name: uniqueString(searchService.id)
+  name: uniqueString(searchServiceId)
   location: 'global'
   properties: {
     registrationEnabled: false
@@ -115,7 +136,8 @@ resource searchPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtual
   }
 }
 
-output searchServiceId string = searchService.id
-output searchServicePrincipalId string = searchService.identity.principalId
-output searchServiceName string = searchService.name
-output searchServiceEndpoint string = 'https://${searchServiceName}.search.windows.net'
+// Outputs remain consistent regardless of using existing or new search service
+output searchServiceId string = searchServiceId
+output searchServicePrincipalId string = searchServicePrincipalId
+output searchServiceName string = searchServiceNameOutput
+output searchServiceEndpoint string = searchServiceEndpoint

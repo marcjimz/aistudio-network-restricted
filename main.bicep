@@ -46,7 +46,12 @@ param systemDatastoresAuthMode string = 'identity'
 ])
 param connectionAuthMode string = 'ApiKey'
 
-// Variables
+@description('Resource group name for the existing search service. Keep empty if you want the template to provision.')
+param searchRgGroup string
+
+@description('Resource name for the existing search service. Keep empty if you want the template to provision.')
+param searchResourceName string
+
 var name = toLower('${aiHubName}')
 
 // Create a short, unique suffix, that will be unique to each resource group
@@ -54,6 +59,22 @@ var uniqueSuffix = substring(uniqueString(resourceGroup().id), 0, 7)
 
 var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
 var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
+
+resource getUserPrincipalIdScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'get-user-principal-id'
+  location: resourceGroup().location
+  kind: 'AzureCLI'
+  properties: {
+    azCliVersion: '2.30.0'
+    scriptContent: '''
+      userPrincipalId=$(az ad signed-in-user show --query objectId -o tsv)
+      echo $userPrincipalId > $AZ_SCRIPTS_OUTPUT_PATH
+    '''
+    timeout: 'PT5M'
+    retentionInterval: 'PT1H' // Retains the deployment script for 10 minutes
+    cleanupPreference: 'OnSuccess'
+  }
+}
 
 // Dependent resources for the Azure Machine Learning workspace
 module aiDependencies 'modules/dependent-resources.bicep' = {
@@ -64,6 +85,9 @@ module aiDependencies 'modules/dependent-resources.bicep' = {
     subnetResourceId: subnetResourceId
     vnetResourceId: vnetResourceId
     prefix: prefix
+
+    searchRgGroup: searchRgGroup
+    searchResourceName: searchResourceName
   }
 }
 
@@ -77,10 +101,10 @@ module aiHub 'modules/ai-hub.bicep' = {
     location: location
     tags: tags
 
-    //metadata
+    // metadata
     uniqueSuffix: uniqueSuffix
 
-    //network related
+    // network related
     vnetResourceId: vnetResourceId
     subnetResourceId: subnetResourceId
 
@@ -91,19 +115,20 @@ module aiHub 'modules/ai-hub.bicep' = {
     containerRegistryId: aiDependencies.outputs.containerRegistryId
     keyVaultId: aiDependencies.outputs.keyvaultId
     storageAccountId: aiDependencies.outputs.storageId
+
+    // **Conditional Search Service Parameters**
     searchId: aiDependencies.outputs.searchServiceId
     searchTarget: aiDependencies.outputs.searchServiceTarget
 
-    //configuration settings
+    // configuration settings
     systemDatastoresAuthMode: systemDatastoresAuthMode
     connectionAuthMode: connectionAuthMode
 
   }
 }
 
-// Assignment of roles necessary for template usage
-module roleAssignments 'modules/role-assignments.bicep' = {
-  name: 'role-assignments-${name}-${uniqueSuffix}-deployment'
+module serviceRoleAssignments 'modules/service-assignments.bicep' = {
+  name: 'service-role-assignments-${name}-${uniqueSuffix}-deployment'
   params: {
     aiHubName: aiHub.outputs.aiHubName
     aiHubPrincipalId: aiHub.outputs.aiHubPrincipalId
@@ -113,7 +138,21 @@ module roleAssignments 'modules/role-assignments.bicep' = {
     searchServiceName: aiDependencies.outputs.searchServiceName
     storageName: aiDependencies.outputs.storageName
   }
-  dependsOn:[
+  dependsOn: [
     aiHub
+  ]
+}
+
+module userRoleAssignments 'modules/user-assignments.bicep' = {
+  name: 'user-role-assignment-${uniqueSuffix}-deployment'
+  params: {
+    aiHubName: aiHub.outputs.aiHubName
+    aiServicesName: aiDependencies.outputs.aiservicesName
+    searchServiceName: aiDependencies.outputs.searchServiceName
+    storageName: aiDependencies.outputs.storageName
+    user: getUserPrincipalIdScript.properties.outputs.output
+  }
+  dependsOn: [
+    serviceRoleAssignments
   ]
 }
