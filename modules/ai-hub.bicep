@@ -150,6 +150,23 @@ resource aiHub 'Microsoft.MachineLearningServices/workspaces@2024-10-01-preview'
 
 }
 
+resource aiHubProject 'Microsoft.MachineLearningServices/workspaces@2024-10-01-preview' = {
+  name: projectName
+  location: location
+  kind: 'Project'
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+  }
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    hubResourceId: aiHub.id
+  }
+
+}
+
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
   name: privateEndpointName
   location: location
@@ -167,15 +184,6 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-11-01' = {
         }
       }
     ]
-  }
-
-  resource aiHubProject 'projects@2024-10-01-preview' = {
-    name: projectName
-    location: location
-    kind: 'Project'
-    identity: {
-      type: 'SystemAssigned'
-    }
   }
 
 }

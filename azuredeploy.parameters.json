@@ -31,6 +31,9 @@
       },
       "searchResourceName": {
         "value": ""
+      },
+      "entraPrincipalIds": {
+        "value": ""
       }
   }
 }

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "13876463594192649835"
+      "templateHash": "12266342533741751566"
     }
   },
   "parameters": {
@@ -105,6 +105,12 @@
       "metadata": {
         "description": "Resource name for the existing search service. Keep empty if you want the template to provision."
       }
+    },
+    "entraPrincipalIds": {
+      "type": "string",
+      "metadata": {
+        "description": "Comma separated entra principal IDs to add to the repo"
+      }
     }
   },
   "variables": {
@@ -114,20 +120,6 @@
     "subnetResourceId": "[format('{0}/subnets/{1}', variables('vnetResourceId'), parameters('subnetName'))]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Resources/deploymentScripts",
-      "apiVersion": "2020-10-01",
-      "name": "get-user-principal-id",
-      "location": "[resourceGroup().location]",
-      "kind": "AzureCLI",
-      "properties": {
-        "azCliVersion": "2.30.0",
-        "scriptContent": "      userPrincipalId=$(az ad signed-in-user show --query objectId -o tsv)\r\n      echo $userPrincipalId > $AZ_SCRIPTS_OUTPUT_PATH\r\n    ",
-        "timeout": "PT5M",
-        "retentionInterval": "PT1H",
-        "cleanupPreference": "OnSuccess"
-      }
-    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
@@ -1646,7 +1638,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "7370999289924996503"
+              "templateHash": "1543705594818381776"
             }
           },
           "parameters": {
@@ -1817,19 +1809,6 @@
               ]
             },
             {
-              "type": "Microsoft.Network/privateEndpoints/projects",
-              "apiVersion": "2024-10-01-preview",
-              "name": "[format('{0}/{1}', variables('privateEndpointName'), variables('projectName'))]",
-              "location": "[parameters('location')]",
-              "kind": "Project",
-              "identity": {
-                "type": "SystemAssigned"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
-              ]
-            },
-            {
               "type": "Microsoft.MachineLearningServices/workspaces",
               "apiVersion": "2024-10-01-preview",
               "name": "[parameters('aiHubName')]",
@@ -1854,6 +1833,26 @@
                 "sharedPrivateLinkResources": []
               },
               "kind": "hub"
+            },
+            {
+              "type": "Microsoft.MachineLearningServices/workspaces",
+              "apiVersion": "2024-10-01-preview",
+              "name": "[variables('projectName')]",
+              "location": "[parameters('location')]",
+              "kind": "Project",
+              "sku": {
+                "name": "Basic",
+                "tier": "Basic"
+              },
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "hubResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]"
+              ]
             },
             {
               "type": "Microsoft.Network/privateEndpoints",
@@ -2145,9 +2144,13 @@
       ]
     },
     {
+      "copy": {
+        "name": "userRoleAssignments",
+        "count": "[length(split(parameters('entraPrincipalIds'), ','))]"
+      },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('user-role-assignment-{0}-deployment', variables('uniqueSuffix'))]",
+      "name": "[format('user-role-{0}-{1}-deployment', variables('uniqueSuffix'), substring(split(parameters('entraPrincipalIds'), ',')[copyIndex()], 0, 6))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -2167,7 +2170,7 @@
             "value": "[reference(resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix'))), '2022-09-01').outputs.storageName.value]"
           },
           "user": {
-            "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'get-user-principal-id'), '2020-10-01').outputs.output]"
+            "value": "[split(parameters('entraPrincipalIds'), ',')[copyIndex()]]"
           }
         },
         "template": {
@@ -2317,7 +2320,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Resources/deployments', format('dependencies-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]",
         "[resourceId('Microsoft.Resources/deployments', format('ai-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]",
-        "[resourceId('Microsoft.Resources/deploymentScripts', 'get-user-principal-id')]",
         "[resourceId('Microsoft.Resources/deployments', format('service-role-assignments-{0}-{1}-deployment', variables('name'), variables('uniqueSuffix')))]"
       ]
     }

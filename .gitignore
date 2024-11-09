@@ -7,3 +7,5 @@ nested_*.bicep
 .DS_Store
 temp.bicep 09-05-30-184.bicep
 temp.json 09-05-30-552.json
+test.bicep
+test.json

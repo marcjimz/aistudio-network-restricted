@@ -52,6 +52,9 @@ param searchRgGroup string
 @description('Resource name for the existing search service. Keep empty if you want the template to provision.')
 param searchResourceName string
 
+@description('Comma separated entra principal IDs to add to the repo')
+param entraPrincipalIds string
+
 var name = toLower('${aiHubName}')
 
 // Create a short, unique suffix, that will be unique to each resource group
@@ -59,22 +62,6 @@ var uniqueSuffix = substring(uniqueString(resourceGroup().id), 0, 7)
 
 var vnetResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${vnetRgName}/providers/Microsoft.Network/virtualNetworks/${vnetName}'
 var subnetResourceId = '${vnetResourceId}/subnets/${subnetName}'
-
-resource getUserPrincipalIdScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
-  name: 'get-user-principal-id'
-  location: resourceGroup().location
-  kind: 'AzureCLI'
-  properties: {
-    azCliVersion: '2.30.0'
-    scriptContent: '''
-      userPrincipalId=$(az ad signed-in-user show --query objectId -o tsv)
-      echo $userPrincipalId > $AZ_SCRIPTS_OUTPUT_PATH
-    '''
-    timeout: 'PT5M'
-    retentionInterval: 'PT1H' // Retains the deployment script for 10 minutes
-    cleanupPreference: 'OnSuccess'
-  }
-}
 
 // Dependent resources for the Azure Machine Learning workspace
 module aiDependencies 'modules/dependent-resources.bicep' = {
@@ -143,16 +130,16 @@ module serviceRoleAssignments 'modules/service-assignments.bicep' = {
   ]
 }
 
-module userRoleAssignments 'modules/user-assignments.bicep' = {
-  name: 'user-role-assignment-${uniqueSuffix}-deployment'
+module userRoleAssignments 'modules/user-assignments.bicep' = [for userPrincipalId in split(entraPrincipalIds, ','): {
+  name: 'user-role-${uniqueSuffix}-${substring(userPrincipalId, 0, 6)}-deployment'
   params: {
     aiHubName: aiHub.outputs.aiHubName
     aiServicesName: aiDependencies.outputs.aiservicesName
     searchServiceName: aiDependencies.outputs.searchServiceName
     storageName: aiDependencies.outputs.storageName
-    user: getUserPrincipalIdScript.properties.outputs.output
+    user: userPrincipalId
   }
   dependsOn: [
     serviceRoleAssignments
   ]
-}
+}]
