@@ -47,6 +47,8 @@ Limitations are maintained and kept up-to-date [here](https://learn.microsoft.co
 
 This template expects that you have private VNet setup for your organization, and that you have traffic patterns established to access it securely. You must have access to creating private endpoints for the VNet setup you wish to connect.
 
+This template will provision user access for the provisioning user, and the expectation is that your system will assign the necessary roles required to develop in this system. For more information, read the [developer role assignments](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/secure-data-playground#assign-roles-to-developers).
+
 ## Resources
 
 | Provider and type | Description |
