@@ -10,7 +10,7 @@ param searchServiceName string
 @description('Storage Name')
 param storageName string
 
-@description('Singular user email')
+@description('Singular user principal id')
 param user string
 
 var roleId = {
@@ -23,15 +23,6 @@ var roleId = {
   CognitiveServicesOpenAiContributor : 'a001fd3d-188f-4b5d-821b-7da978bf7442'
   StorageFileDataPrivilegedContributor : '69566ab7-960f-475b-8e7c-b3118f30c6bd'
 }
-
-var userRoles = [
-  {name : 'SearchServiceContributor', scope: 'searchService'}
-  {name : 'SearchIndexDataContributor', scope: 'searchService'}
-  {name : 'CognitiveServicesOpenAiContributor', scope: 'aiServices'}
-  {name : 'CognitiveServicesContributor', scope: 'aiServices'}
-  {name : 'StorageBlobDataContributor', scope: 'storage'}
-  {name : 'StorageFileDataPrivilegedContributor', scope: 'storage'}
-]
 
 resource searchService 'Microsoft.Search/searchServices@2023-11-01' existing = {
   name: searchServiceName
