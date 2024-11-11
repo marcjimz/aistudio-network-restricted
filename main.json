@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "4867400957060864398"
+      "templateHash": "17326053221802383477"
     }
   },
   "parameters": {
@@ -108,6 +108,7 @@
     },
     "entraPrincipalIds": {
       "type": "string",
+      "defaultValue": "",
       "metadata": {
         "description": "Comma separated entra principal IDs to add to the repo"
       }

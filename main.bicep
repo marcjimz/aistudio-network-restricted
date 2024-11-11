@@ -53,7 +53,7 @@ param searchRgGroup string
 param searchResourceName string
 
 @description('Comma separated entra principal IDs to add to the repo')
-param entraPrincipalIds string
+param entraPrincipalIds string = ''
 
 var name = toLower('${aiHubName}')
 
